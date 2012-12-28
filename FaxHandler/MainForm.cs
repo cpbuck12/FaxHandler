@@ -391,7 +391,7 @@ namespace FaxHandler
                 isTempFile = false;
             }
             else
-            {
+            { 
                 //wrap standard IDataObject in OutlookDataObject
                 OutlookDataObject dataObject = new OutlookDataObject(e.Data);
 
