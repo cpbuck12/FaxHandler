@@ -25,9 +25,7 @@ namespace FaxHandler
             Consultation,
             Procedure
         }
-        string fileName;
-        bool tempFile;
-        AcroAVDoc document;
+        PDF.Document document;
         Timer timer;
         double minimumOpacity = 0.0;
         bool suspendValidation = false;
@@ -309,18 +307,9 @@ namespace FaxHandler
         {
             if (document != null)
             {
-                document.Close(1); // no save
+                document.Dispose();
                 document = null;
-                if (tempFile)
-                    File.Delete(fileName);
             }
-        }
-        int GetAvailablePages()
-        {
-            if (!document.IsValid())
-                return 0;
-            CAcroPDDoc pdoc = document.GetPDDoc();
-            return pdoc.GetNumPages();
         }
         string DateToString(DateTime dateTime)
         {
@@ -382,16 +371,22 @@ namespace FaxHandler
         void MainForm_DragDrop(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.None;
-            string newFileName;
-            bool isTempFile;
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
-                newFileName = files[0];
-                isTempFile = false;
+                try
+                {
+                    CloseDocument();
+                    document = new PDF.Document(files[0]);
+                }
+                catch (Exception exception)
+                {
+                    ShowError(exception.Message);
+                }
             }
             else
-            { 
+            {
+                string newFileName;
                 //wrap standard IDataObject in OutlookDataObject
                 OutlookDataObject dataObject = new OutlookDataObject(e.Data);
 
@@ -401,40 +396,25 @@ namespace FaxHandler
                 if (filenames.Length != 1 || !IsPdfFileName(filenames[0]))
                     return;
                 MemoryStream[] filestreams = (MemoryStream[])dataObject.GetData("FileContents");
-                isTempFile = true;
                 newFileName = Path.GetTempFileName() + filenames[0];
 
                 try
                 {
-                    FileInfo fileInfo = new FileInfo(fileName);
-                    FileStream tempFileStream = File.Create(fileName);
+                    FileInfo fileInfo = new FileInfo(newFileName);
+                    FileStream tempFileStream = File.Create(newFileName);
                     fileInfo.Attributes = FileAttributes.Temporary;
                     filestreams[0].WriteTo(tempFileStream);
                     tempFileStream.Close();
+                    CloseDocument();
+                    document = new PDF.Document(newFileName);
                 }
                 catch (System.Exception ex)
                 {
                     ShowError(ex.Message);
                 }
             }
-            try
-            {
-                CloseDocument();
-                tempFile = isTempFile;
-                fileName = newFileName;
-                document = new AcroAVDoc();
-                document.Open(fileName, "");
-                document.BringToFront();
-                document.SetViewMode(2); // PDUseThumbs
-                CAcroAVPageView pageView = document.GetAVPageView() as CAcroAVPageView;
-                pageView.ZoomTo(1 /*AVZoomFitPage*/, 100);
-            }
-            catch (System.Exception ex)
-            {
-                ShowError(ex.Message);
-                fileName = null;
-                tempFile = false;
-            }
+            document.Show();
+            document.Zoom(PDF.ZoomLevel.FitPage);
         }
         void MainForm_DragEnter(object sender, DragEventArgs e)
         {
@@ -461,7 +441,7 @@ namespace FaxHandler
         void CheckDocument()
         {
             if (document != null)
-                if (!document.IsValid())
+                if (!document.Valid)
                 {
                     document = null;
                 }
@@ -547,16 +527,16 @@ namespace FaxHandler
                 e.Cancel = false;
                 return;
             }
-            if (!document.IsValid())
+            if (!document.Valid)
             {
                 ShowError("The document has been closed");
                 e.Cancel = true;
             }
-            int pageCount = GetAvailablePages();
-            PageRange pageRange = new PageRange();
+            int pageCount = document.Pages;
+            PageRanges pageRanges;
             try
             {
-                pageRange.Range = text;
+                pageRanges = new PageRanges(text);
             }
             catch (Exception ex)
             {
@@ -564,7 +544,7 @@ namespace FaxHandler
                 e.Cancel = true;
                 return;
             }
-            if (pageRange.End > pageCount)
+            if (pageRanges.LastPage > pageCount)
             {
                 ShowError(String.Format("There are only {0} page(s) in the doucment",pageCount));
                 e.Cancel = true;
@@ -578,7 +558,6 @@ namespace FaxHandler
             string startingDirectory = null;
             DirectoryInfo directoryInfoMain;
             DirectoryInfo[] dirs;
-            bool overwrite = false;
 
             try
             {
@@ -651,7 +630,9 @@ namespace FaxHandler
                 return;
             }
             dialog.SelectedPath = startingDirectory;
-            var result = Show(dialog);
+            ConciergeBrowser browser = new ConciergeBrowser(startingDirectory);
+            var result = browser.ShowDialog(this);
+            // var result = Show(dialog);
             if (result == DialogResult.OK)
             {
                 string tempPath = Path.GetTempFileName() + ".PDF";
@@ -661,8 +642,10 @@ namespace FaxHandler
                     + (saveType == SaveType.Procedure ? " " + textBoxProcedureName.Text + " " :  " CONSULT ")
                     + GetTextBoxLocation(saveType).Text + " " + GetTextBoxDoctor(saveType).Text + " " +
                     PatientsDirectoryName(saveType) + ".PDF";
-                string destinationPath = dialog.SelectedPath +
-                    (dialog.SelectedPath.Last() != '\\' ? @"\" : String.Empty) + fileName;
+//                string destinationPath = dialog.SelectedPath +
+//                    (dialog.SelectedPath.Last() != '\\' ? @"\" : String.Empty) + fileName;
+                string destinationPath = browser.SelectedDirctory.FullName +
+                    (browser.SelectedDirctory.FullName.Last() != '\\' ? @"\" : String.Empty) + fileName;
 
                 if (File.Exists(destinationPath))
                 {
@@ -673,14 +656,22 @@ namespace FaxHandler
                     result = AskYesNo(message:prompt,caption: "Warning");
                     if (result == DialogResult.No)
                         return;
-                    overwrite = true;
                 }
+                PageRanges pageRanges;
+                if(GetTextBoxPages(saveType).Text.Trim() == string.Empty)
+                    pageRanges = PageRanges.All;
+                else
+                    pageRanges = new PageRanges(GetTextBoxPages(saveType).Text);
+                /*
                 PageRange pageRange = new PageRange();
                 pageRange.Range = GetTextBoxPages(saveType).Text;
+                  */
+                /*
                 CAcroPDDoc pdoc = document.GetPDDoc();
                 object jsObject = pdoc.GetJSObject();
                 Type T = jsObject.GetType();
-                object[] parameters = {/* pdoc,*/ tempPathPortable, pageRange.Begin-1, pageRange.End-1 };
+                object[] parameters = { //  pdoc,
+                tempPathPortable, pageRange.Begin-1, pageRange.End-1 };
 
                 try
                 {
@@ -692,11 +683,19 @@ namespace FaxHandler
                         jsObject,
                         parameters);
                 }
+                    */
+                try
+                {
+                    PDF.Document trimmedDocument = document.Trim(pageRanges);
+                    trimmedDocument.Save(destinationPath);
+                    trimmedDocument.Dispose();
+                }
                 catch (Exception exception)
                 {
                     ShowError("Acrobat reported an error when extracting the pages.\n" + exception.Message);
                     return;
                 }
+                /*
                 if (overwrite)
                 {
                     try
@@ -721,6 +720,7 @@ namespace FaxHandler
                         return;
                     }
                 }
+                 */
                 if(checkBoxView.Checked)
                     Process.Start("explorer.exe", "/select,\"" + destinationPath + "\"");
                 if (saveType == SaveType.Procedure)

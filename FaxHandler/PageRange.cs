@@ -6,59 +6,30 @@ using System.Text.RegularExpressions;
 
 namespace FaxHandler
 {
-    class PageRange
+    public class PageRange
     {
-        private string text;
-        private int begin;
-        private int end;
-        public int Begin
+        public int Begin { set; get; }
+        public int End { set; get; }
+        public int Length
         {
             get
             {
-                if (text == null)
-                    throw new Exception("PageRange not initialized");
-                return begin;
+                return End - Begin;
             }
         }
-        public int End
+        bool Between(int less, int value, int more)
         {
-            get
-            {
-                if (text == null)
-                    throw new Exception("PageRange not initialized");
-                return end;
-            }
+            if (less <= value && value <= more)
+                return true;
+            else
+                return false;
         }
-        public string Range
+        public bool Overlap(PageRange other)
         {
-            set
-            {
-                text = value.Trim();
-                Regex rSimple = new Regex(@"^\d+$");
-                if (rSimple.IsMatch(text))
-                {
-                    int page = int.Parse(text);
-                    if(page == 0)
-                    {
-                        throw new Exception("No zeroth page");
-                    }
-                    begin = end = page;
-                    return;
-                }
-                Regex rRange = new Regex(@"(?<begin>\d+)\s*-\s*(?<end>\d+)");
-                if (rRange.IsMatch(text))
-                {
-                    Match match = rRange.Match(text);
-                    int begin = int.Parse(match.Groups["begin"].Value);
-                    int end = int.Parse(match.Groups["end"].Value);
-                    if (begin == 0 || end == 0 || end <= begin)
-                        throw new Exception("Bad page range");
-                    this.begin = begin;
-                    this.end = end;
-                }
-                else
-                    throw new Exception("Invalid format");
-            }
+            if (Between(Begin, other.Begin, End) || Between(Begin, other.End, End))
+                return true;
+            else
+                return false;
         }
     }
 }

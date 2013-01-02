@@ -7,53 +7,73 @@ using System.Text;
 
 namespace FaxHandler
 {
-    internal class Enumerator : IEnumerator<PageRange>
+    public class PageRanges : IEnumerable<PageRange>
     {
-        PageRange IEnumerator<PageRange>.Current
-        {
-            get { throw new NotImplementedException(); }
-        }
+        static public PageRanges All = new PageRanges();
+        PageRange[] pageRanges;
 
-        void IDisposable.Dispose()
+        private PageRanges()
         {
-            throw new NotImplementedException();
         }
-
-        object IEnumerator.Current
+        public int LastPage
         {
-            get { throw new NotImplementedException(); }
-        }
-
-        bool IEnumerator.MoveNext()
-        {
-            throw new NotImplementedException();
-        }
-
-        void IEnumerator.Reset()
-        {
-            throw new NotImplementedException();
-        }
-    }
-    class PageRanges : IEnumerable<PageRange>
-    {
-        private string text;
-        public string Ranges
-        {
-            set
+            get
             {
-                Regex r = new Regex(@"(\d+(-\d+)*)+(,\d+(-\d+)*)*");
-                text = value.Trim();
-                char[] delimeters = { ',' };
-                text.Split(delimeters);
+                return (from range in pageRanges
+                        select range.End).Max();
+            }
+        }
+        public PageRanges(string value)
+        {
+            string s = value.TrimAll();
+            if (s == string.Empty)
+                throw new FormatException("Page Ranges empty");
+
+
+            string[] commastrings = s.Split(',');
+            List<PageRange> ranges = new List<PageRange>();
+            foreach (string commastring in commastrings)
+            {
+                string[] minusstrings = commastring.Split('-');
+                PageRange pageRange = new PageRange();
+                if (minusstrings.Length == 1)
+                {
+                    pageRange.Begin = pageRange.End = int.Parse(minusstrings[0]);
+                }
+                else
+                {
+                    if (minusstrings[0] == string.Empty)
+                        throw new FormatException("Page Range with begining");
+                    if (minusstrings[1] == string.Empty)
+                        throw new FormatException("Page Range without ending");
+                    pageRange.Begin = int.Parse(minusstrings[0]);
+                    pageRange.End = int.Parse(minusstrings[1]);
+                    if (pageRange.Begin >= pageRange.End)
+                        throw new FormatException("Page Range out of order");
+                }
+                ranges.Add(pageRange);
+            }
+            PageRange lastRange = null;
+            foreach (var range in (from r in ranges orderby r.Begin select r))
+            {
+                if (lastRange == null)
+                    lastRange = range;
+                else
+                {
+                    if (lastRange.Overlap(range))
+                        throw new ArgumentException("Overlapping pages");
+                    lastRange = range;
+                }
+                pageRanges = ranges.ToArray();
             }
         }
 
         IEnumerator<PageRange> IEnumerable<PageRange>.GetEnumerator()
         {
-            throw new NotImplementedException();
+            return pageRanges.Cast<PageRange>().GetEnumerator();
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
         {
             throw new NotImplementedException();
         }
