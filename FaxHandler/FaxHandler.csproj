@@ -55,6 +55,12 @@
     <Compile Include="ConciergeBrowser.Designer.cs">
       <DependentUpon>ConciergeBrowser.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dragger.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dragger.Designer.cs">
+      <DependentUpon>Dragger.cs</DependentUpon>
+    </Compile>
     <Compile Include="EnumExtensions.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -78,6 +84,9 @@
     <EmbeddedResource Include="ConciergeBrowser.resx">
       <DependentUpon>ConciergeBrowser.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dragger.resx">
+      <DependentUpon>Dragger.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -89,6 +98,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="SetupForm.resx">
       <DependentUpon>SetupForm.cs</DependentUpon>
@@ -132,6 +142,9 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\MainIcon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

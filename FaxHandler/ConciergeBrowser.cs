@@ -14,12 +14,26 @@ namespace FaxHandler
     public partial class ConciergeBrowser : Form
     {
         string startingDirectory;
+        TreeNode selectedTreeNode;
         DirectoryInfo selectedDirectory;
-        public DirectoryInfo SelectedDirctory
+        public DirectoryInfo SelectedDirectory
         {
             get
             {
                 return selectedDirectory;
+            }
+        }
+        public DirectoryInfo[] SelectedPath
+        {
+            get
+            {
+                var list = new List<DirectoryInfo>();
+                TreeNode current;
+                for (current = selectedTreeNode; current.Parent != null; current = current.Parent)
+                {
+                    list.Insert(0,(GetDirectoryInfo(current)));
+                }
+                return list.ToArray();
             }
         }
         public ConciergeBrowser(string startingDirectory)
@@ -99,8 +113,8 @@ namespace FaxHandler
             {
                 TreeNode patientTreeNode = sequence.First();
                 treeViewDirectories.SelectedNode = patientTreeNode;
+                patientTreeNode.ExpandAll();
                 patientTreeNode.EnsureVisible();
-                patientTreeNode.Expand();
             }
         }
 
@@ -111,6 +125,7 @@ namespace FaxHandler
             else
                 buttonSave.Enabled = true;
             selectedDirectory = GetDirectoryInfo(e.Node);
+            selectedTreeNode = e.Node;
         }
 
         private void buttonSave_Click(object sender, EventArgs e)

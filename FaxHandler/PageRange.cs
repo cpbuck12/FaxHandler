@@ -14,7 +14,7 @@ namespace FaxHandler
         {
             get
             {
-                return End - Begin;
+                return End - Begin + 1;
             }
         }
         bool Between(int less, int value, int more)

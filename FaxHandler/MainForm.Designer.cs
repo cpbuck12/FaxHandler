@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.groupBoxConsult = new System.Windows.Forms.GroupBox();
             this.textBoxConsultPatientsLastName = new System.Windows.Forms.TextBox();
             this.textBoxConsultPatientsFirstName = new System.Windows.Forms.TextBox();
@@ -66,6 +67,7 @@
             this.buttonSaveConsult = new System.Windows.Forms.Button();
             this.buttonSaveProcedure = new System.Windows.Forms.Button();
             this.checkBoxView = new System.Windows.Forms.CheckBox();
+            this.dragger1 = new FaxHandler.Dragger();
             this.groupBoxConsult.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -437,11 +439,22 @@
             this.checkBoxView.UseVisualStyleBackColor = true;
             this.checkBoxView.CheckedChanged += new System.EventHandler(this.checkBoxView_CheckedChanged);
             // 
+            // dragger1
+            // 
+            this.dragger1.BackColor = System.Drawing.SystemColors.Control;
+            this.dragger1.Dragging = false;
+            this.dragger1.Filename = "";
+            this.dragger1.Location = new System.Drawing.Point(12, 177);
+            this.dragger1.Name = "dragger1";
+            this.dragger1.Size = new System.Drawing.Size(83, 40);
+            this.dragger1.TabIndex = 308;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(751, 300);
+            this.Controls.Add(this.dragger1);
             this.Controls.Add(this.checkBoxView);
             this.Controls.Add(this.buttonSaveProcedure);
             this.Controls.Add(this.buttonSaveConsult);
@@ -456,6 +469,7 @@
             this.Controls.Add(this.labelConsultPages);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBoxConsult);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "Fax Handler";
             this.TopMost = true;
@@ -512,6 +526,7 @@
         private System.Windows.Forms.Button buttonSaveConsult;
         private System.Windows.Forms.Button buttonSaveProcedure;
         private System.Windows.Forms.CheckBox checkBoxView;
+        private Dragger dragger1;
 
     }
 }

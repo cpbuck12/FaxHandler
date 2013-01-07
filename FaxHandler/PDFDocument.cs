@@ -10,15 +10,6 @@ namespace FaxHandler.PDF
     // we get a file from explorer/mozilla or outlook.  outlook files will be temp files, others will not
     // either way, we need a temp file.  so, copy explorer/mozilla to temp file to keep same operations.
     // take the temp file, make a new PDDoc which will be anonymous.
-    // when extracting, it will be from the anonymous pddoc to another temp file, which will then be moved/copied
-    // to the ultimate destination.  whew!
-    public enum ZoomLevel
-    {
-        FitHeight = 0,
-        FitPage = 1,
-        FitVisibleWidth = 2,
-        FitWidth = 3
-    }
     public enum PDSaveFlags
     {
 	    PDSaveIncremental	= 0x0000,	/* write changes only */
@@ -29,6 +20,22 @@ namespace FaxHandler.PDF
 											    */
 	    PDSaveBinaryOK		= 0x0010,	/* OK to store binary in file */
 	    PDSaveCollectGarbage = 0x0020	/* perform garbage collection on unreferenced objects */
+    }
+    public enum AVZoomType
+    {
+        AVZoomNoVary,					/* no variable zoom */
+        AVZoomFitPage,					/* fit page to window */
+        AVZoomFitWidth,					/* fit page width to window */
+        AVZoomFitHeight,				/* fit page height to window */
+        AVZoomFitVisibleWidth,			/* fit visible width to window */
+        AVZoomPreferred					/* use page's preferred zoom */
+    }
+    public enum ZoomLevel
+    {
+        FitHeight = AVZoomType.AVZoomFitHeight,
+        FitPage = AVZoomType.AVZoomFitHeight,
+        FitVisibleWidth = AVZoomType.AVZoomFitVisibleWidth,
+        FitWidth = AVZoomType.AVZoomFitWidth
     }
 
     public class Document :   IDisposable, ICloneable
@@ -66,7 +73,7 @@ namespace FaxHandler.PDF
         public void Zoom(short percent)
         {
             CAcroAVPageView pageView = AVDocument.GetAVPageView();
-            pageView.ZoomTo(4 /* TODO: should be AVZoomNoVary, check */, percent);
+            pageView.ZoomTo((short)(AVZoomType.AVZoomNoVary), percent);
         }
         public void Zoom(ZoomLevel zoom)
         {
@@ -95,7 +102,7 @@ namespace FaxHandler.PDF
                 initialPDDocument.Save((short)(PDSaveFlags.PDSaveCopy | PDSaveFlags.PDSaveFull | PDSaveFlags.PDSaveCollectGarbage), this.fileName);
                 initialAVDocument.Close(1 /*no save*/);
                 AVDocument = new AcroAVDoc();
-                AVDocument.Open(this.fileName, "");
+                AVDocument.Open(this.fileName, "Copy of "+fileName);
                 PDDoc();
             }
             catch (Exception exception)
@@ -106,15 +113,12 @@ namespace FaxHandler.PDF
         }
         bool Trim(PageRange pageRange)
         {
-            int pages = Pages;
             if (pageRange.Begin < 0 || pageRange.Begin >= Pages || pageRange.End >= Pages || pageRange.Begin > pageRange.End)
-            {
-                return false; // TODO: throw exception?
-            }
-            if(pageRange.End - 1 < pages)
-                PDDoc().DeletePages(pageRange.End, pages - 1);
+                return false; 
+            if(pageRange.End - 1 < Pages)
+                PDDoc().DeletePages(pageRange.End, Pages - 1);
             if (pageRange.Begin > 1)
-                PDDoc().DeletePages(0, pageRange.Begin - 1);
+                PDDoc().DeletePages(0, pageRange.Begin - 2);
             return true;
         }
         void Append(Document otherDocument)
@@ -124,41 +128,21 @@ namespace FaxHandler.PDF
         public Document Trim(PageRanges pageRanges)
         {
             Document newDocument =(Document)Clone();
-            newDocument.Trim(pageRanges.ToArray()[0]);
+            if (!newDocument.Trim(pageRanges.ToArray()[0]))
+                return null;
             foreach (var pageRange in pageRanges.Skip(1))
             {
                 Document tempDocument = (Document)Clone();
-                tempDocument.Trim(pageRange);
+                if (!tempDocument.Trim(pageRange))
+                {
+                    newDocument.Dispose();
+                    tempDocument.Dispose();
+                    return null;
+                }
                 newDocument.Append(tempDocument);
                 tempDocument.Dispose();
             }
             return newDocument;
-            // return (Trim(pageRanges.ToArray()[0])); // TODO: temporary definition for testing.  in the final version,
-            //Trim does as whole lot more
-        }
-        private Document Extract(PageRanges ranges)
-        {
-            if (!Valid)
-            {
-                throw new Exception("No freakin way!");
-            }
-            Document Document = new Document(this.fileName);
-            if (ReferenceEquals(ranges, PageRanges.All))
-                Document.PDDoc().InsertPages(0, PDDoc(), 0, PDDoc().GetNumPages(), 1/*copy bookmarks too*/);
-            else
-            {
-                if ((from r in ranges
-                     where r.End >= this.Pages
-                     select r).Count() > 0)
-                {
-                    throw new ArgumentException("Trying to extract pages beyond the end of the document");
-                }
-                foreach (var range in ranges)
-                {
-                    Document.PDDoc().InsertPages(PDDoc().GetNumPages(), PDDoc(), range.Begin - 1, range.Length, 1/*copy bookmarks too*/);
-                }
-            }
-            return Document;
         }
         public Object Clone()
         {
@@ -169,7 +153,6 @@ namespace FaxHandler.PDF
                 return null;
             Document newDocument = new Document(fileName);
             return newDocument;
-            //return Extract(PageRanges.All);
         }
         public void Dispose()
         {
@@ -177,6 +160,10 @@ namespace FaxHandler.PDF
             {
                 AVDocument.Close(1 /* no save */);
                 AVDocument = null;
+            }
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
             }
         }
     }

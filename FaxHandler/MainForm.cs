@@ -25,6 +25,7 @@ namespace FaxHandler
             Consultation,
             Procedure
         }
+        FileInfo draggableFile;
         PDF.Document document;
         Timer timer;
         double minimumOpacity = 0.0;
@@ -243,8 +244,16 @@ namespace FaxHandler
             public static extern int GetWindowLong(IntPtr hWnd, int nIndex);
         }
         #endregion
-        // TODO: handle, somewhere in this file, moving files across system volumes.  its most likely unhandled and untested
+
         #region Utilities
+        string GenerateFilename(SaveType saveType,string suffix)
+        {
+            string fileName = GetTextBoxDate(saveType).Text
+                + (saveType == SaveType.Procedure ? " " + textBoxProcedureName.Text + " " :  " CONSULT ")
+                    + GetTextBoxLocation(saveType).Text + " " + GetTextBoxDoctor(saveType).Text + " " +
+                    PatientsDirectoryName(saveType).TrimAll() + suffix + ".PDF";
+            return fileName;
+        }
         string PatientsDirectoryName(SaveType saveType)
         {
             string result = string.Format("{0}, {1}", GetTextBoxPatientsLastName(saveType).Text, GetTextBoxPatientsFirstName(saveType).Text).ToUpper(); ;
@@ -299,7 +308,6 @@ namespace FaxHandler
             }
             catch (Exception)
             {
-                
                 throw;
             }
         }
@@ -377,11 +385,16 @@ namespace FaxHandler
                 try
                 {
                     CloseDocument();
+                    Cursor = Cursors.WaitCursor;
                     document = new PDF.Document(files[0]);
                 }
                 catch (Exception exception)
                 {
                     ShowError(exception.Message);
+                }
+                finally
+                {
+                    Cursor = Cursors.Default;
                 }
             }
             else
@@ -405,12 +418,17 @@ namespace FaxHandler
                     fileInfo.Attributes = FileAttributes.Temporary;
                     filestreams[0].WriteTo(tempFileStream);
                     tempFileStream.Close();
+                    Cursor = Cursors.WaitCursor;
                     CloseDocument();
                     document = new PDF.Document(newFileName);
                 }
                 catch (System.Exception ex)
                 {
                     ShowError(ex.Message);
+                }
+                finally
+                {
+                    Cursor = Cursors.Default;
                 }
             }
             document.Show();
@@ -443,6 +461,7 @@ namespace FaxHandler
             if (document != null)
                 if (!document.Valid)
                 {
+                    document.Dispose();
                     document = null;
                 }
             if (document != null)
@@ -462,6 +481,7 @@ namespace FaxHandler
         }
         void UpdateSaveButtons()
         {
+            bool drag = false;
             foreach (SaveType saveType in Enum.GetValues(typeof(SaveType)))
             {
                 if (GetTextBoxPages(saveType).Text.Trim().Length > 0
@@ -473,13 +493,34 @@ namespace FaxHandler
                 {
                     GetButtonSave(saveType, concierge: true).Enabled = true;
                     GetButtonSave(saveType, concierge: false).Enabled = true;
+                    drag = true;
                 }
                 else
                 {
                     GetButtonSave(saveType, concierge: true).Enabled = false;
                     GetButtonSave(saveType, concierge: false).Enabled = false;
                 }
-
+            }
+            if (drag)
+            {
+                string tempDirName = Path.GetTempFileName() + ".dir";
+                Directory.CreateDirectory(tempDirName);
+                if (!Directory.Exists(tempDirName))
+                    return;
+                string fileName = tempDirName + "\\" + GenerateFilename(SaveType.Consultation, " _dragged");
+                document.Save(fileName);
+                draggableFile = new FileInfo(fileName);
+                dragger1.Filename = fileName;
+                // TODO
+            }
+            else
+            {
+                if (draggableFile != null)
+                {
+                    Directory.Delete(draggableFile.Directory.FullName, true);
+                    draggableFile = null;
+                }
+                dragger1.Filename = null;
             }
         }
 
@@ -554,7 +595,6 @@ namespace FaxHandler
         }
         private void Save(SaveType saveType, bool concierge)
         {
-            FolderBrowserDialog dialog = new FolderBrowserDialog();
             string startingDirectory = null;
             DirectoryInfo directoryInfoMain;
             DirectoryInfo[] dirs;
@@ -629,23 +669,44 @@ namespace FaxHandler
                     ShowError("Cannot find " + Properties.Settings.Default.LastSavedDirectory);
                 return;
             }
-            dialog.SelectedPath = startingDirectory;
-            ConciergeBrowser browser = new ConciergeBrowser(startingDirectory);
-            var result = browser.ShowDialog(this);
-            // var result = Show(dialog);
+            DialogResult result;
+            string destinationDirectory;
+            string location = " _conciergefolder";
+            if (concierge)
+            {
+                ConciergeBrowser browser = new ConciergeBrowser(startingDirectory);
+                result = browser.ShowDialog(this);
+                destinationDirectory = browser.SelectedDirectory.FullName;
+                DirectoryInfo[] path;
+                foreach (var p in browser.SelectedPath.Skip(1))
+                {
+                    string input = p.Name.Trim();
+                    string core = Regex.Replace(input,"#$",s => ( string.Empty ));
+                    location = location + "_" + core.Replace(" ", "__").ToUpper();
+                } 
+                path = browser.SelectedPath;
+            }
+            else
+            {
+                FolderBrowserDialog dialog = new FolderBrowserDialog();
+                dialog.SelectedPath = startingDirectory;
+                result = Show(dialog);
+                destinationDirectory = dialog.SelectedPath;
+            }
             if (result == DialogResult.OK)
             {
                 string tempPath = Path.GetTempFileName() + ".PDF";
-                string tempPathPortable = GetPortablePath(tempPath);
-                string fileName =
+
+                string fileName;
+                fileName = GenerateFilename(saveType, concierge ? location : "_nonconcierge");
+                /*
                     (GetTextBoxDate(saveType).Text)
                     + (saveType == SaveType.Procedure ? " " + textBoxProcedureName.Text + " " :  " CONSULT ")
                     + GetTextBoxLocation(saveType).Text + " " + GetTextBoxDoctor(saveType).Text + " " +
-                    PatientsDirectoryName(saveType) + ".PDF";
-//                string destinationPath = dialog.SelectedPath +
-//                    (dialog.SelectedPath.Last() != '\\' ? @"\" : String.Empty) + fileName;
-                string destinationPath = browser.SelectedDirctory.FullName +
-                    (browser.SelectedDirctory.FullName.Last() != '\\' ? @"\" : String.Empty) + fileName;
+                    PatientsDirectoryName(saveType).TrimAll() + (concierge ? location : "_nonconcierge" ) + ".PDF";
+                 */
+                string destinationPath = destinationDirectory +
+                    (destinationDirectory.Last() != '\\' ? @"\" : String.Empty) + fileName;
 
                 if (File.Exists(destinationPath))
                 {
@@ -658,35 +719,28 @@ namespace FaxHandler
                         return;
                 }
                 PageRanges pageRanges;
-                if(GetTextBoxPages(saveType).Text.Trim() == string.Empty)
+                if (GetTextBoxPages(saveType).Text.Trim() == string.Empty)
                     pageRanges = PageRanges.All;
                 else
-                    pageRanges = new PageRanges(GetTextBoxPages(saveType).Text);
-                /*
-                PageRange pageRange = new PageRange();
-                pageRange.Range = GetTextBoxPages(saveType).Text;
-                  */
-                /*
-                CAcroPDDoc pdoc = document.GetPDDoc();
-                object jsObject = pdoc.GetJSObject();
-                Type T = jsObject.GetType();
-                object[] parameters = { //  pdoc,
-                tempPathPortable, pageRange.Begin-1, pageRange.End-1 };
-
-                try
                 {
-                    T.InvokeMember("ExtractPagesToFile",
-                        BindingFlags.InvokeMethod |
-                        BindingFlags.Public |
-                        BindingFlags.Instance,
-                        null, // no binder
-                        jsObject,
-                        parameters);
+                    try
+                    {
+                        pageRanges = new PageRanges(GetTextBoxPages(saveType).Text);
+                    }
+                    catch (Exception)
+                    {
+                        ShowError("Wasn't able to parse the page range");
+                        return;
+                    }
                 }
-                    */
                 try
                 {
                     PDF.Document trimmedDocument = document.Trim(pageRanges);
+                    if (trimmedDocument == null)
+                    {
+                        ShowError("Couldn't trim and save the new PDF.");
+                        return;
+                    }
                     trimmedDocument.Save(destinationPath);
                     trimmedDocument.Dispose();
                 }
@@ -695,34 +749,39 @@ namespace FaxHandler
                     ShowError("Acrobat reported an error when extracting the pages.\n" + exception.Message);
                     return;
                 }
-                /*
-                if (overwrite)
+                if (checkBoxView.Checked)
                 {
-                    try
+                    int tries = 5;
+                    int sleepTime = 1 * 1000; // one second
+                    for (int i = 0; i < tries;i++ )
                     {
-                        File.Copy(tempPath, destinationPath, overwrite:true);
+                        System.Threading.Thread.Sleep(sleepTime); // gives Acrobat a chance to finish
+                        FileInfo fileInfo = new FileInfo(destinationPath);
+                        if (!fileInfo.Exists)
+                            continue;
+                        try
+                        {
+                            FileStream fs = File.Open(destinationPath, FileMode.Open, FileAccess.ReadWrite);
+                            fs.Close();
+                            break;
+                        }
+                        catch (IOException e)
+                        {
+                            const int ERROR_SHARING_VIOLATION = 0x20;
+                            const int ERROR_LOCK_VIOLATION = 0x21;
+                            int errorCode = Marshal.GetHRForException(e) & 0xFFFF;
+                            if (errorCode == ERROR_SHARING_VIOLATION || errorCode == ERROR_LOCK_VIOLATION)
+                            {
+                                continue;
+                            }
+                        }
                     }
-                    catch (Exception exceptionOnFileCopy)
-                    {
-                        ShowError("Error copying the temporary file over the original file.\n" + exceptionOnFileCopy.Message);
-                        return;
-                    }
+                    if(concierge)
+                        Process.Start("explorer.exe", "/select,\"" + startingDirectory + "\"");
+                    else
+                        Process.Start("explorer.exe", "/select,\"" + destinationPath + "\"");
+                    System.Threading.Thread.Sleep(1000);
                 }
-                else
-                {
-                    try
-                    {
-                        File.Move(tempPath, destinationPath);
-                    }
-                    catch (Exception exceptionOnFileMove)
-                    {
-                        ShowError("Error moving the temporary file to the final destination.\n" + exceptionOnFileMove.Message);
-                        return;
-                    }
-                }
-                 */
-                if(checkBoxView.Checked)
-                    Process.Start("explorer.exe", "/select,\"" + destinationPath + "\"");
                 if (saveType == SaveType.Procedure)
                 {
                     AddPredefinedProcedure(textBoxProcedureName.Text);
@@ -768,6 +827,5 @@ namespace FaxHandler
             return result;
         }
         #endregion
-
     }
 }
