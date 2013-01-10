@@ -14,22 +14,18 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Diagnostics;
 using Acrobat;
+using System.Security.Principal;
 
 namespace FaxHandler
 {
     public partial class MainForm : Form
     {
         #region Declarations
-        enum SaveType
-        {
-            Consultation,
-            Procedure
-        }
-        FileInfo draggableFile;
         PDF.Document document;
         Timer timer;
         double minimumOpacity = 0.0;
         bool suspendValidation = false;
+        FileInfo draggableFile = null;
         #endregion
         #region Constructor
         public MainForm()
@@ -88,19 +84,11 @@ namespace FaxHandler
         }
         private void buttonSaveConciergeProcedure_Click(object sender, EventArgs e)
         {
-            Save(SaveType.Procedure, concierge: true);
+            Save(concierge: true);
         }
         private void buttonSaveProcedure_Click(object sender, EventArgs e)
         {
-            Save(SaveType.Procedure, concierge: false);
-        }
-        private void buttonSaveConsult_Click(object sender, EventArgs e)
-        {
-            Save(SaveType.Consultation, concierge: false);
-        }
-        private void buttonSaveConciergeConsult_Click(object sender, EventArgs e)
-        {
-            Save(SaveType.Consultation, concierge: true);
+            Save(concierge: false);
         }
         private void MainForm_Deactivate(object sender, EventArgs e)
         {
@@ -120,16 +108,6 @@ namespace FaxHandler
             textBoxPages_Validate(sender, e);
             UpdateSaveButtons();
         }
-        private void buttonCopyToProcedure_Click(object sender, EventArgs e)
-        {
-            Copy(SaveType.Consultation);
-        }
-
-        private void buttonCopyToConsult_Click(object sender, EventArgs e)
-        {
-            Copy(SaveType.Procedure);
-        }
-
         private void textBox_Validating(object sender, CancelEventArgs e)
         {
             TextBox textBox = sender as TextBox;
@@ -147,11 +125,6 @@ namespace FaxHandler
                 e.Cancel = false;
             }
             textBox.Text = val.ToUpper();
-            UpdateSaveButtons();
-        }
-        private void dateTimePickerConsult_ValueChanged(object sender, EventArgs e)
-        {
-            textBoxConsultDate.Text = DateToString(dateTimePickerConsult.Value);
             UpdateSaveButtons();
         }
         private void buttonSetup_Click(object sender, EventArgs e)
@@ -174,67 +147,40 @@ namespace FaxHandler
         }
         #endregion
         #region Control Accessors
-        DateTimePicker GetDateTimePicker(SaveType saveType)
+        DateTimePicker GetDateTimePicker()
         {
-            if (saveType == SaveType.Consultation)
-                return dateTimePickerConsult;
-            else
-                return dateTimePickerProcedure;
+            return dateTimePickerProcedure;
         }
-        Button GetButtonSave(SaveType saveType, bool concierge)
+        Button GetButtonSave(bool concierge)
         {
-            if (saveType == SaveType.Consultation)
-                if (concierge)
-                    return buttonSaveConciergeConsult;
-                else
-                    return buttonSaveConsult;
+            if (concierge)
+                return buttonSaveConciergeProcedure;
             else
-                if (concierge)
-                    return buttonSaveConciergeProcedure;
-                else
-                    return buttonSaveProcedure;
+                return buttonSaveProcedure;
         }
-        TextBox GetTextBoxDoctor(SaveType saveType)
+        TextBox GetTextBoxDoctor()
         {
-            if (saveType == SaveType.Consultation)
-                return textBoxConsultDoctor;
-            else
-                return textBoxProcedureDoctor;
+            return textBoxProcedureDoctor;
         }
-        TextBox GetTextBoxPages(SaveType saveType)
+        TextBox GetTextBoxPages()
         {
-            if (saveType == SaveType.Consultation)
-                return textBoxConsultPages;
-            else
-                return textBoxProcedurePages;
+            return textBoxProcedurePages;
         }
-        TextBox GetTextBoxDate(SaveType saveType)
+        TextBox GetTextBoxDate()
         {
-            if (saveType == SaveType.Consultation)
-                return textBoxConsultDate;
-            else
-                return textBoxProcedureDate;
+            return textBoxProcedureDate;
         }
-        TextBox GetTextBoxLocation(SaveType saveType)
+        TextBox GetTextBoxLocation()
         {
-            if (saveType == SaveType.Consultation)
-                return textBoxConsultLocation;
-            else
-                return textBoxProcedureLocation;
+            return textBoxProcedureLocation;
         }
-        TextBox GetTextBoxPatientsFirstName(SaveType saveType)
+        TextBox GetTextBoxPatientsFirstName()
         {
-            if (saveType == SaveType.Consultation)
-                return textBoxConsultPatientsFirstName;
-            else
-                return textBoxProcedurePatientsFirstName;
+            return textBoxProcedurePatientsFirstName;
         }
-        TextBox GetTextBoxPatientsLastName(SaveType saveType)
+        TextBox GetTextBoxPatientsLastName()
         {
-            if (saveType == SaveType.Consultation)
-                return textBoxConsultPatientsLastName;
-            else
-                return textBoxProcedurePatientsLastName;
+            return textBoxProcedurePatientsLastName;
         }
         #endregion
         #region Native Methods
@@ -246,17 +192,19 @@ namespace FaxHandler
         #endregion
 
         #region Utilities
-        string GenerateFilename(SaveType saveType,string suffix)
+        string GenerateFilename(string suffix)
         {
-            string fileName = GetTextBoxDate(saveType).Text
-                + (saveType == SaveType.Procedure ? " " + textBoxProcedureName.Text + " " :  " CONSULT ")
-                    + GetTextBoxLocation(saveType).Text + " " + GetTextBoxDoctor(saveType).Text + " " +
-                    PatientsDirectoryName(saveType).TrimAll() + suffix + ".PDF";
+            string[] tempParts = WindowsIdentity.GetCurrent().Name.Split('\\');
+            string userName = tempParts[1];
+            string fileName = GetTextBoxDate().Text
+                + ( " " + textBoxProcedureName.Text + " ")
+                    + GetTextBoxLocation().Text + " " + GetTextBoxDoctor().Text + " " +
+                    PatientsDirectoryName().TrimAll() + suffix + " _u" + userName + ".PDF";
             return fileName;
         }
-        string PatientsDirectoryName(SaveType saveType)
+        string PatientsDirectoryName()
         {
-            string result = string.Format("{0}, {1}", GetTextBoxPatientsLastName(saveType).Text, GetTextBoxPatientsFirstName(saveType).Text).ToUpper(); ;
+            string result = string.Format("{0}, {1}", GetTextBoxPatientsLastName().Text, GetTextBoxPatientsFirstName().Text).ToUpper(); ;
             return result;
         }
         void EnsureTopmost()
@@ -269,13 +217,13 @@ namespace FaxHandler
                 TopMost = true;
             }
         }
-        void UpdateDirectoryLabels(string fileName,SaveType saveType)
+        void UpdateDirectoryLabels(string fileName)
         {
             try
             {
                 FileInfo fileInfo = new FileInfo(fileName);
                 DirectoryInfo di = fileInfo.Directory;
-                string patientDirName = PatientsDirectoryName(saveType);
+                string patientDirName = PatientsDirectoryName();
                 DirectoryInfo diConcierge = new DirectoryInfo(Properties.Settings.Default.ConciergeLocation);
                 while (di != null)
                 {
@@ -466,79 +414,86 @@ namespace FaxHandler
                 }
             if (document != null)
             {
-                foreach (SaveType saveType in Enum.GetValues(typeof(SaveType)))
-                    GetTextBoxPages(saveType).Enabled = true;
+                GetTextBoxPages().Enabled = true;
             }
             else
             {
-                foreach (SaveType saveType in Enum.GetValues(typeof(SaveType)))
+                TextBox textBox = GetTextBoxPages();
+                textBox.Enabled = false;
+                textBox.Clear();
+            }
+        }
+        bool ValidPageRange(int numberOfPages)
+        {
+            PageRanges pageRanges;
+            string s = GetTextBoxPages().Text.TrimAll();
+            if (s == string.Empty)
+                return false;
+            try
+            {
+                pageRanges = new PageRanges(s);
+                if (pageRanges.LastPage > numberOfPages)
+                    return false;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+        public FileInfo GetDraggableFileInfo()
+        {
+            FileInfo result = null;
+            try
+            {
+                if(draggableFile != null)
                 {
-                    TextBox textBox = GetTextBoxPages(saveType);
-                    textBox.Enabled = false;
-                    textBox.Clear();
+                    Directory.Delete(draggableFile.DirectoryName,true);
+                    draggableFile = null;
+                }
+                PageRanges pageRanges = new PageRanges(GetTextBoxPages().Text.TrimAll());
+                string tempDirName = Path.GetTempFileName() + ".dir";
+                Directory.CreateDirectory(tempDirName);
+                if(Directory.Exists(tempDirName))
+                {
+                    PDF.Document trimmedDocument = document.TrimPages(pageRanges);
+                    string fileName = GenerateFilename(" _drag" + TimeStamp());
+                    string fullFileName = tempDirName + "\\" + fileName;
+                    trimmedDocument.Save(fullFileName);
+                    result = new FileInfo(fullFileName);
+                    trimmedDocument.Dispose();
                 }
             }
+            catch (Exception)
+            {
+                result = null;
+            }
+            return result;
         }
         void UpdateSaveButtons()
         {
-            bool drag = false;
-            foreach (SaveType saveType in Enum.GetValues(typeof(SaveType)))
+
+            if (GetTextBoxPages().Text.Trim().Length > 0
+                && GetTextBoxDate().Text.Trim().Length > 0
+                && GetTextBoxDoctor().Text.Trim().Length > 0
+                && GetTextBoxLocation().Text.Trim().Length > 0
+                && GetTextBoxPatientsFirstName().Text.Trim().Length > 0
+                && GetTextBoxPatientsLastName().Text.Trim().Length > 0
+                && ValidPageRange(document.Pages))
             {
-                if (GetTextBoxPages(saveType).Text.Trim().Length > 0
-                    && GetTextBoxDate(saveType).Text.Trim().Length > 0
-                    && GetTextBoxDoctor(saveType).Text.Trim().Length > 0
-                    && GetTextBoxLocation(saveType).Text.Trim().Length > 0
-                    && GetTextBoxPatientsFirstName(saveType).Text.Trim().Length > 0
-                    && GetTextBoxPatientsLastName(saveType).Text.Trim().Length > 0)
-                {
-                    GetButtonSave(saveType, concierge: true).Enabled = true;
-                    GetButtonSave(saveType, concierge: false).Enabled = true;
-                    drag = true;
-                }
-                else
-                {
-                    GetButtonSave(saveType, concierge: true).Enabled = false;
-                    GetButtonSave(saveType, concierge: false).Enabled = false;
-                }
-            }
-            if (drag)
-            {
-                string tempDirName = Path.GetTempFileName() + ".dir";
-                Directory.CreateDirectory(tempDirName);
-                if (!Directory.Exists(tempDirName))
-                    return;
-                string fileName = tempDirName + "\\" + GenerateFilename(SaveType.Consultation, " _dragged");
-                document.Save(fileName);
-                draggableFile = new FileInfo(fileName);
-                dragger1.Filename = fileName;
-                // TODO
+                dragger1.Full = GetButtonSave(concierge: true).Enabled = GetButtonSave(concierge: false).Enabled = true;
             }
             else
             {
-                if (draggableFile != null)
-                {
-                    Directory.Delete(draggableFile.Directory.FullName, true);
-                    draggableFile = null;
-                }
-                dragger1.Filename = null;
+                dragger1.Full = GetButtonSave(concierge: true).Enabled = GetButtonSave(concierge: false).Enabled = false;
             }
         }
 
-        private void Copy(SaveType from)
-        {
-            SaveType to = (from == SaveType.Procedure ? SaveType.Consultation : SaveType.Procedure);
-            if (GetTextBoxDate(from).Text.Length != 0)
-                GetDateTimePicker(to).Value = GetDateTimePicker(from).Value;
-            if (GetTextBoxDoctor(from).Text.Length != 0)
-                GetTextBoxDoctor(to).Text = GetTextBoxDoctor(from).Text;
-            if (GetTextBoxLocation(from).Text.Length != 0)
-                GetTextBoxLocation(to).Text = GetTextBoxLocation(from).Text;
-            if (GetTextBoxPatientsFirstName(from).Text.Length != 0)
-                GetTextBoxPatientsFirstName(to).Text = GetTextBoxPatientsFirstName(from).Text;
-            if (GetTextBoxPatientsLastName(from).Text.Length != 0)
-                GetTextBoxPatientsLastName(to).Text = GetTextBoxPatientsLastName(from).Text;
-        }
         #endregion
+        string TimeStamp()
+        {
+            return string.Format("{0:yyyyMMdd_HHmm}", DateTime.Now);
+        }
         protected override void WndProc(ref Message m)
         {
             const int WM_SYSCOMMAND = 0x112;
@@ -553,6 +508,26 @@ namespace FaxHandler
             }
             base.WndProc(ref m);
         }
+        bool ValidatePageRange(string s)
+        {
+            s = s.TrimAll();
+            if (s == string.Empty)
+                return false;
+            if (!document.Valid)
+                return false;
+            PageRanges pageRanges = null;
+            try
+            {
+                pageRanges = new PageRanges(s);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            if (pageRanges.LastPage > document.Pages)
+                return false;
+            return true;
+        }
         private void textBoxPages_Validate(object sender, CancelEventArgs e)
         {
             CheckDocument();
@@ -561,8 +536,17 @@ namespace FaxHandler
                 e.Cancel = false;
                 return;
             }
+
             TextBox textBox = sender as TextBox;
             string text = textBox.Text.Trim();
+            if (!ValidatePageRange(text))
+            {
+                e.Cancel = true;
+                return;
+            }
+            e.Cancel = false;
+            return;
+            /*
             if (text.Trim().Length == 0)
             {
                 e.Cancel = false;
@@ -592,8 +576,9 @@ namespace FaxHandler
                 return;
             }
             e.Cancel = false;
+            */
         }
-        private void Save(SaveType saveType, bool concierge)
+        private void Save(bool concierge)
         {
             string startingDirectory = null;
             DirectoryInfo directoryInfoMain;
@@ -628,7 +613,7 @@ namespace FaxHandler
                 {
                     try
                     {
-                        dirs = directoryInfoMain.GetDirectories(PatientsDirectoryName(saveType),SearchOption.TopDirectoryOnly);
+                        dirs = directoryInfoMain.GetDirectories(PatientsDirectoryName(),SearchOption.TopDirectoryOnly);
                     }
                     catch (ArgumentException argumentException)
                     {
@@ -671,7 +656,7 @@ namespace FaxHandler
             }
             DialogResult result;
             string destinationDirectory;
-            string location = " _conciergefolder";
+            string location = " _concierge" + TimeStamp();
             if (concierge)
             {
                 ConciergeBrowser browser = new ConciergeBrowser(startingDirectory);
@@ -698,7 +683,7 @@ namespace FaxHandler
                 string tempPath = Path.GetTempFileName() + ".PDF";
 
                 string fileName;
-                fileName = GenerateFilename(saveType, concierge ? location : "_nonconcierge");
+                fileName = GenerateFilename(concierge ? location : " _nonconcierge" + TimeStamp());
                 /*
                     (GetTextBoxDate(saveType).Text)
                     + (saveType == SaveType.Procedure ? " " + textBoxProcedureName.Text + " " :  " CONSULT ")
@@ -719,13 +704,13 @@ namespace FaxHandler
                         return;
                 }
                 PageRanges pageRanges;
-                if (GetTextBoxPages(saveType).Text.Trim() == string.Empty)
+                if (GetTextBoxPages().Text.Trim() == string.Empty)
                     pageRanges = PageRanges.All;
                 else
                 {
                     try
                     {
-                        pageRanges = new PageRanges(GetTextBoxPages(saveType).Text);
+                        pageRanges = new PageRanges(GetTextBoxPages().Text);
                     }
                     catch (Exception)
                     {
@@ -735,7 +720,7 @@ namespace FaxHandler
                 }
                 try
                 {
-                    PDF.Document trimmedDocument = document.Trim(pageRanges);
+                    PDF.Document trimmedDocument = document.TrimPages(pageRanges);
                     if (trimmedDocument == null)
                     {
                         ShowError("Couldn't trim and save the new PDF.");
@@ -782,13 +767,10 @@ namespace FaxHandler
                         Process.Start("explorer.exe", "/select,\"" + destinationPath + "\"");
                     System.Threading.Thread.Sleep(1000);
                 }
-                if (saveType == SaveType.Procedure)
-                {
-                    AddPredefinedProcedure(textBoxProcedureName.Text);
-                }
+                AddPredefinedProcedure(textBoxProcedureName.Text);
                 if (concierge)
                 {
-                    UpdateDirectoryLabels(destinationPath,saveType);
+                    UpdateDirectoryLabels(destinationPath);
                 }
             }
         }

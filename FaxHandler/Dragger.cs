@@ -6,20 +6,25 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.IO;
 
 namespace FaxHandler
 {
     public partial class Dragger : UserControl
     {
-        bool full;
         Rectangle dragBoxFromMouseDown;
-        string filename;
+        bool full = false;
 
         public bool Full
         {
             get
             {
-                return Filename != null && Filename != string.Empty;
+                return full;
+            }
+            set
+            {
+                full = value;
+                Invalidate();
             }
         }
         public bool Dragging
@@ -27,24 +32,10 @@ namespace FaxHandler
             get;
             set;
         }
-        public string Filename
-        {
-            set
-            {
-                filename = value;
-                Invalidate();
-            }
-            get
-            {
-                return filename;
-            }
-        }
         public Dragger()
         {
             InitializeComponent();
-            filename = @"z:\develop\long";
         }
-
         private void Dragger_Paint(object sender, PaintEventArgs e)
         {
             Dragger dragger = sender as Dragger;
@@ -70,7 +61,10 @@ namespace FaxHandler
                 return;
             if (!Full)
                 return;
-            string[] filenames = { filename };
+            string filename;
+            MainForm mainForm = (MainForm)Parent;
+            FileInfo fileInfo = mainForm.GetDraggableFileInfo();
+            string[] filenames = { fileInfo.FullName };
             MainForm parent = Parent as MainForm;
             parent.AllowDrop = false;
             DataObject dataObject = new DataObject(DataFormats.FileDrop, filenames);

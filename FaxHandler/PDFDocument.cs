@@ -102,7 +102,7 @@ namespace FaxHandler.PDF
                 initialPDDocument.Save((short)(PDSaveFlags.PDSaveCopy | PDSaveFlags.PDSaveFull | PDSaveFlags.PDSaveCollectGarbage), this.fileName);
                 initialAVDocument.Close(1 /*no save*/);
                 AVDocument = new AcroAVDoc();
-                AVDocument.Open(this.fileName, "Copy of "+fileName);
+                AVDocument.Open(this.fileName, "Copy of " + fileName);
                 PDDoc();
             }
             catch (Exception exception)
@@ -125,7 +125,7 @@ namespace FaxHandler.PDF
         {
             PDDoc().InsertPages(Pages - 1, otherDocument.PDDoc(), 0, otherDocument.Pages, 1 /*copy bookmarks too*/);
         }
-        public Document Trim(PageRanges pageRanges)
+        public Document TrimPages(PageRanges pageRanges)
         {
             Document newDocument =(Document)Clone();
             if (!newDocument.Trim(pageRanges.ToArray()[0]))
