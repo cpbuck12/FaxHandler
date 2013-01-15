@@ -114,17 +114,22 @@ namespace FaxHandler
             if (suspendValidation)
                 return;
             string val = textBox.Text.Trim();
-            Regex r = new Regex(@"\s+");
+            Regex r = new Regex(@"\-+");
             if (r.IsMatch(val))
             {
-                ShowError("No embedded spaces are allowed");
+                ShowError("No embedded hyphens are allowed");
+                e.Cancel = true;
+            }
+            else if (Regex.IsMatch(val,@"<+|>+|:+|/+|\\+|\|+|\?+|\*+|""+"))
+            {
+                ShowError(@"None of these characters are allowed: <>:\"" /\|?*");
                 e.Cancel = true;
             }
             else
             {
                 e.Cancel = false;
             }
-            textBox.Text = val.ToUpper();
+            //textBox.Text = val.ToUpper();
             UpdateSaveButtons();
         }
         private void buttonSetup_Click(object sender, EventArgs e)
@@ -196,10 +201,13 @@ namespace FaxHandler
         {
             string[] tempParts = WindowsIdentity.GetCurrent().Name.Split('\\');
             string userName = tempParts[1];
-            string fileName = GetTextBoxDate().Text
-                + ( " " + textBoxProcedureName.Text + " ")
-                    + GetTextBoxLocation().Text + " " + GetTextBoxDoctor().Text + " " +
-                    PatientsDirectoryName().TrimAll() + suffix + " _u" + userName + ".PDF";
+            string fileName = GetTextBoxDate().Text.Replace("-","")
+                + "--PROCEDURE--" + textBoxProcedureName.Text
+                    + "--LOCATION--" + GetTextBoxLocation().Text 
+                    + "--DOCTOR--" + GetTextBoxDoctor().Text
+                    + "--PATIENT--" + PatientsDirectoryName().TrimAll() 
+                    + "--USER--" + userName
+                    + suffix + ".PDF";
             return fileName;
         }
         string PatientsDirectoryName()
@@ -457,14 +465,14 @@ namespace FaxHandler
                 if(Directory.Exists(tempDirName))
                 {
                     PDF.Document trimmedDocument = document.TrimPages(pageRanges);
-                    string fileName = GenerateFilename(" _drag" + TimeStamp());
+                    string fileName = GenerateFilename("--SVD--" + TimeStamp());
                     string fullFileName = tempDirName + "\\" + fileName;
                     trimmedDocument.Save(fullFileName);
                     result = new FileInfo(fullFileName);
                     trimmedDocument.Dispose();
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 result = null;
             }
@@ -492,7 +500,7 @@ namespace FaxHandler
         #endregion
         string TimeStamp()
         {
-            return string.Format("{0:yyyyMMdd_HHmm}", DateTime.Now);
+            return string.Format("{0:yyyyMMddHHmm}", DateTime.Now);
         }
         protected override void WndProc(ref Message m)
         {
@@ -656,7 +664,7 @@ namespace FaxHandler
             }
             DialogResult result;
             string destinationDirectory;
-            string location = " _concierge" + TimeStamp();
+            string location = string.Empty;
             if (concierge)
             {
                 ConciergeBrowser browser = new ConciergeBrowser(startingDirectory);
@@ -667,7 +675,7 @@ namespace FaxHandler
                 {
                     string input = p.Name.Trim();
                     string core = Regex.Replace(input,"#$",s => ( string.Empty ));
-                    location = location + "_" + core.Replace(" ", "__").ToUpper();
+                    location += core + "_";
                 } 
                 path = browser.SelectedPath;
             }
@@ -680,29 +688,12 @@ namespace FaxHandler
             }
             if (result == DialogResult.OK)
             {
-                string tempPath = Path.GetTempFileName() + ".PDF";
-
-                string fileName;
-                fileName = GenerateFilename(concierge ? location : " _nonconcierge" + TimeStamp());
                 /*
                     (GetTextBoxDate(saveType).Text)
                     + (saveType == SaveType.Procedure ? " " + textBoxProcedureName.Text + " " :  " CONSULT ")
                     + GetTextBoxLocation(saveType).Text + " " + GetTextBoxDoctor(saveType).Text + " " +
                     PatientsDirectoryName(saveType).TrimAll() + (concierge ? location : "_nonconcierge" ) + ".PDF";
                  */
-                string destinationPath = destinationDirectory +
-                    (destinationDirectory.Last() != '\\' ? @"\" : String.Empty) + fileName;
-
-                if (File.Exists(destinationPath))
-                {
-                    string prompt = String.Format(
-                        "The file \"{0}\" already exists in folder \"{1}\". "+
-                        "Do you want to replace it?  If you do, the original file will be lost forever.",
-                        fileName, destinationPath);
-                    result = AskYesNo(message:prompt,caption: "Warning");
-                    if (result == DialogResult.No)
-                        return;
-                }
                 PageRanges pageRanges;
                 if (GetTextBoxPages().Text.Trim() == string.Empty)
                     pageRanges = PageRanges.All;
@@ -718,13 +709,29 @@ namespace FaxHandler
                         return;
                     }
                 }
+                string destinationPath;
                 try
                 {
+
                     PDF.Document trimmedDocument = document.TrimPages(pageRanges);
                     if (trimmedDocument == null)
                     {
                         ShowError("Couldn't trim and save the new PDF.");
                         return;
+                    }
+                    string fileName;
+                    fileName = GenerateFilename((concierge ? "--SVC--" + location : "--SV--")  + TimeStamp());
+                    destinationPath = destinationDirectory + (destinationDirectory.Last() != '\\' ? @"\" : String.Empty) + fileName;
+
+                    if (File.Exists(destinationPath))
+                    {
+                        string prompt = String.Format(
+                            "The file \"{0}\" already exists in folder \"{1}\". " +
+                            "Do you want to replace it?  If you do, the original file will be lost forever.",
+                            fileName, destinationPath);
+                        result = AskYesNo(message: prompt, caption: "Warning");
+                        if (result == DialogResult.No)
+                            return;
                     }
                     trimmedDocument.Save(destinationPath);
                     trimmedDocument.Dispose();

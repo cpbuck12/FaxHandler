@@ -87,6 +87,19 @@
             "PrerequisitesLocation" = "2:1"
             "Url" = "8:"
             "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.0,Profile=Client"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4 Client Profile (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.0,Profile=Client"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Windows.Installer.3.1"
+                    {
+                    "Name" = "8:Windows Installer 3.1"
+                    "ProductCode" = "8:Microsoft.Windows.Installer.3.1"
+                    }
+                }
             }
         }
     }
@@ -174,7 +187,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Fax Handler"
         "ProductCode" = "8:{3E4289C2-8477-4A0C-8F82-A7CDD1028FE1}"
-        "PackageCode" = "8:{DF9909D3-E0F7-41C7-8698-260AFE6F0B04}"
+        "PackageCode" = "8:{0B6A10A9-B922-4706-A79B-722C0F1496C2}"
         "UpgradeCode" = "8:{0830FD46-E699-45DA-8C07-A050063DDF36}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

@@ -36,6 +36,7 @@
             this.labelDivider = new System.Windows.Forms.Label();
             this.buttonSave = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
+            this.labelBuildInfo = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // labelConciegeLocation
@@ -49,10 +50,12 @@
             // 
             // labelConciegeLocationValue
             // 
+            this.labelConciegeLocationValue.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.labelConciegeLocationValue.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.labelConciegeLocationValue.Location = new System.Drawing.Point(212, 25);
             this.labelConciegeLocationValue.Name = "labelConciegeLocationValue";
-            this.labelConciegeLocationValue.Size = new System.Drawing.Size(304, 18);
+            this.labelConciegeLocationValue.Size = new System.Drawing.Size(350, 18);
             this.labelConciegeLocationValue.TabIndex = 1;
             this.labelConciegeLocationValue.Text = ":";
             // 
@@ -77,26 +80,32 @@
             // 
             // textBoxProcedures
             // 
+            this.textBoxProcedures.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxProcedures.Location = new System.Drawing.Point(215, 68);
             this.textBoxProcedures.Multiline = true;
             this.textBoxProcedures.Name = "textBoxProcedures";
-            this.textBoxProcedures.Size = new System.Drawing.Size(280, 200);
+            this.textBoxProcedures.Size = new System.Drawing.Size(347, 254);
             this.textBoxProcedures.TabIndex = 4;
             this.textBoxProcedures.TextChanged += new System.EventHandler(this.textBoxProcedures_TextChanged);
             this.textBoxProcedures.Validating += new System.ComponentModel.CancelEventHandler(this.textBoxProcedures_Validating);
             // 
             // labelDivider
             // 
+            this.labelDivider.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.labelDivider.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.labelDivider.Location = new System.Drawing.Point(0, 284);
+            this.labelDivider.Location = new System.Drawing.Point(4, 382);
             this.labelDivider.Name = "labelDivider";
-            this.labelDivider.Size = new System.Drawing.Size(530, 2);
+            this.labelDivider.Size = new System.Drawing.Size(597, 2);
             this.labelDivider.TabIndex = 5;
             // 
             // buttonSave
             // 
+            this.buttonSave.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.buttonSave.Enabled = false;
-            this.buttonSave.Location = new System.Drawing.Point(112, 304);
+            this.buttonSave.Location = new System.Drawing.Point(149, 414);
             this.buttonSave.Name = "buttonSave";
             this.buttonSave.Size = new System.Drawing.Size(75, 23);
             this.buttonSave.TabIndex = 6;
@@ -106,7 +115,8 @@
             // 
             // buttonCancel
             // 
-            this.buttonCancel.Location = new System.Drawing.Point(333, 304);
+            this.buttonCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.buttonCancel.Location = new System.Drawing.Point(370, 414);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
             this.buttonCancel.TabIndex = 7;
@@ -114,11 +124,22 @@
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
             // 
+            // labelBuildInfo
+            // 
+            this.labelBuildInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelBuildInfo.AutoSize = true;
+            this.labelBuildInfo.Location = new System.Drawing.Point(18, 352);
+            this.labelBuildInfo.Name = "labelBuildInfo";
+            this.labelBuildInfo.Size = new System.Drawing.Size(35, 13);
+            this.labelBuildInfo.TabIndex = 8;
+            this.labelBuildInfo.Text = "label1";
+            // 
             // SetupForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(528, 341);
+            this.ClientSize = new System.Drawing.Size(603, 451);
+            this.Controls.Add(this.labelBuildInfo);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.labelDivider);
@@ -145,5 +166,6 @@
         private System.Windows.Forms.Label labelDivider;
         private System.Windows.Forms.Button buttonSave;
         private System.Windows.Forms.Button buttonCancel;
+        private System.Windows.Forms.Label labelBuildInfo;
     }
 }

@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Reflection;
 
 namespace FaxHandler
 {
@@ -38,6 +39,10 @@ namespace FaxHandler
 
             char[] delimeters = { '\n' };
             textBoxProcedures.Lines = Properties.Settings.Default.Procedures.Split(delimeters);
+            Version version = Assembly.GetEntryAssembly().GetName().Version;
+            DateTime buildDateTime = new DateTime(2000, 1, 1).Add(
+                new TimeSpan(TimeSpan.TicksPerDay * version.Build + TimeSpan.TicksPerSecond * 2 * version.Revision));
+            labelBuildInfo.Text = string.Format("Build Date: {0}", buildDateTime);
         }
 
         private void textBoxProcedures_TextChanged(object sender, EventArgs e)

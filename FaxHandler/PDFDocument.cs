@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Security.Cryptography;
 using Acrobat;
 
 namespace FaxHandler.PDF
@@ -91,6 +92,22 @@ namespace FaxHandler.PDF
             bool result = PDDoc().Save((short)(PDSaveFlags.PDSaveCopy | PDSaveFlags.PDSaveFull | PDSaveFlags.PDSaveCollectGarbage), fileName);
             return result;
         }
+        public string Sha1()
+        {
+            string tempFileName = Path.GetTempFileName() + ".PDF";
+            Save(tempFileName);
+            SHA1 sha1 = SHA1.Create();
+            byte[] results;
+            FileStream fileStream = new FileStream(tempFileName, FileMode.Open);
+            results = sha1.ComputeHash(fileStream);
+            fileStream.Dispose();
+            fileStream = null;
+            File.Delete(tempFileName);
+            string[] values = (from result in results.AsQueryable()
+                               select string.Format("{0:X2}", result)).ToArray();
+            string returnValue = string.Concat(values);
+            return returnValue;
+        }
         public Document(string fileName)
         {
             this.fileName = Path.GetTempFileName() + ".PDF";
@@ -113,9 +130,9 @@ namespace FaxHandler.PDF
         }
         bool Trim(PageRange pageRange)
         {
-            if (pageRange.Begin < 0 || pageRange.Begin >= Pages || pageRange.End >= Pages || pageRange.Begin > pageRange.End)
+            if (pageRange.Begin < 1 || pageRange.Begin > Pages || pageRange.End > Pages || pageRange.Begin > pageRange.End)
                 return false; 
-            if(pageRange.End - 1 < Pages)
+            if(pageRange.End < Pages)
                 PDDoc().DeletePages(pageRange.End, Pages - 1);
             if (pageRange.Begin > 1)
                 PDDoc().DeletePages(0, pageRange.Begin - 2);
