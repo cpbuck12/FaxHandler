@@ -201,7 +201,7 @@ namespace FaxHandler
         {
             string[] tempParts = WindowsIdentity.GetCurrent().Name.Split('\\');
             string userName = tempParts[1];
-            string fileName = GetTextBoxDate().Text.Replace("-","")
+            string fileName = GetTextBoxDate().Text
                 + "--PROCEDURE--" + textBoxProcedureName.Text
                     + "--LOCATION--" + GetTextBoxLocation().Text 
                     + "--DOCTOR--" + GetTextBoxDoctor().Text
