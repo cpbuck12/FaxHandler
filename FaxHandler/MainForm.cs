@@ -114,10 +114,10 @@ namespace FaxHandler
             if (suspendValidation)
                 return;
             string val = textBox.Text.Trim();
-            Regex r = new Regex(@"\-+");
+            Regex r = new Regex(@"\-{2}");
             if (r.IsMatch(val))
             {
-                ShowError("No embedded hyphens are allowed");
+                ShowError("No embedded double hyphens are allowed");
                 e.Cancel = true;
             }
             else if (Regex.IsMatch(val,@"<+|>+|:+|/+|\\+|\|+|\?+|\*+|""+"))
@@ -201,12 +201,13 @@ namespace FaxHandler
         {
             string[] tempParts = WindowsIdentity.GetCurrent().Name.Split('\\');
             string userName = tempParts[1];
-            string fileName = GetTextBoxDate().Text
-                + "--PROCEDURE--" + textBoxProcedureName.Text
-                    + "--LOCATION--" + GetTextBoxLocation().Text 
-                    + "--DOCTOR--" + GetTextBoxDoctor().Text
-                    + "--PATIENT--" + PatientsDirectoryName().TrimAll() 
-                    + "--USER--" + userName
+            string date = GetTextBoxDate().Text;
+            string fileName = date
+                + "--" + textBoxProcedureName.Text
+                    + "--" + GetTextBoxLocation().Text 
+                    + "--" + GetTextBoxDoctor().Text
+                    + "--" + PatientsDirectoryName().TrimAll() 
+                    + "--" + userName
                     + suffix + ".PDF";
             return fileName;
         }
@@ -277,7 +278,8 @@ namespace FaxHandler
         }
         string DateToString(DateTime dateTime)
         {
-            return string.Format("{0:D2}-{1:D2}-{2}", dateTime.Month, dateTime.Day, dateTime.Year);
+            return dateTime.ToString("yyyy-MMM-dd");
+            //return string.Format("{0:D2}-{1:D2}-{2}", dateTime.Month, dateTime.Day, dateTime.Year);
         }
         string[] GetPredefinedProcedures()
         {
