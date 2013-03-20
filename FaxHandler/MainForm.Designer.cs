@@ -30,13 +30,10 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.textBoxProcedureName = new System.Windows.Forms.TextBox();
             this.textBoxProcedurePatientsLastName = new System.Windows.Forms.TextBox();
             this.textBoxProcedurePatientsFirstName = new System.Windows.Forms.TextBox();
-            this.textBoxProcedureLocation = new System.Windows.Forms.TextBox();
             this.textBoxProcedurePages = new System.Windows.Forms.TextBox();
             this.labelProcedurePages = new System.Windows.Forms.Label();
-            this.textBoxProcedureDoctor = new System.Windows.Forms.TextBox();
             this.dateTimePickerProcedure = new System.Windows.Forms.DateTimePicker();
             this.textBoxProcedureDate = new System.Windows.Forms.TextBox();
             this.labelProcedureName = new System.Windows.Forms.Label();
@@ -49,19 +46,26 @@
             this.buttonSaveConciergeProcedure = new System.Windows.Forms.Button();
             this.buttonSaveProcedure = new System.Windows.Forms.Button();
             this.checkBoxView = new System.Windows.Forms.CheckBox();
+            this.comboBoxSuffix = new System.Windows.Forms.ComboBox();
+            this.comboBoxProcedureName = new System.Windows.Forms.ComboBox();
+            this.comboBoxLocation = new System.Windows.Forms.ComboBox();
+            this.comboBoxDoctor = new System.Windows.Forms.ComboBox();
             this.dragger1 = new FaxHandler.Dragger();
+            this.buttonGetName = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
-            this.groupBox1.Controls.Add(this.textBoxProcedureName);
+            this.groupBox1.Controls.Add(this.buttonGetName);
+            this.groupBox1.Controls.Add(this.comboBoxDoctor);
+            this.groupBox1.Controls.Add(this.comboBoxLocation);
+            this.groupBox1.Controls.Add(this.comboBoxProcedureName);
+            this.groupBox1.Controls.Add(this.comboBoxSuffix);
             this.groupBox1.Controls.Add(this.textBoxProcedurePatientsLastName);
             this.groupBox1.Controls.Add(this.textBoxProcedurePatientsFirstName);
-            this.groupBox1.Controls.Add(this.textBoxProcedureLocation);
             this.groupBox1.Controls.Add(this.textBoxProcedurePages);
             this.groupBox1.Controls.Add(this.labelProcedurePages);
-            this.groupBox1.Controls.Add(this.textBoxProcedureDoctor);
             this.groupBox1.Controls.Add(this.dateTimePickerProcedure);
             this.groupBox1.Controls.Add(this.textBoxProcedureDate);
             this.groupBox1.Controls.Add(this.labelProcedureName);
@@ -72,26 +76,16 @@
             this.groupBox1.Controls.Add(this.labelProcedureDate);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(361, 220);
+            this.groupBox1.Size = new System.Drawing.Size(451, 220);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Procedure";
-            // 
-            // textBoxProcedureName
-            // 
-            this.textBoxProcedureName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.textBoxProcedureName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this.textBoxProcedureName.Location = new System.Drawing.Point(148, 157);
-            this.textBoxProcedureName.Name = "textBoxProcedureName";
-            this.textBoxProcedureName.Size = new System.Drawing.Size(205, 20);
-            this.textBoxProcedureName.TabIndex = 105;
-            this.textBoxProcedureName.Validating += new System.ComponentModel.CancelEventHandler(this.textBox_Validating);
             // 
             // textBoxProcedurePatientsLastName
             // 
             this.textBoxProcedurePatientsLastName.Location = new System.Drawing.Point(148, 129);
             this.textBoxProcedurePatientsLastName.Name = "textBoxProcedurePatientsLastName";
-            this.textBoxProcedurePatientsLastName.Size = new System.Drawing.Size(205, 20);
+            this.textBoxProcedurePatientsLastName.Size = new System.Drawing.Size(227, 20);
             this.textBoxProcedurePatientsLastName.TabIndex = 104;
             this.textBoxProcedurePatientsLastName.Validating += new System.ComponentModel.CancelEventHandler(this.textBox_Validating);
             // 
@@ -99,24 +93,16 @@
             // 
             this.textBoxProcedurePatientsFirstName.Location = new System.Drawing.Point(148, 101);
             this.textBoxProcedurePatientsFirstName.Name = "textBoxProcedurePatientsFirstName";
-            this.textBoxProcedurePatientsFirstName.Size = new System.Drawing.Size(205, 20);
+            this.textBoxProcedurePatientsFirstName.Size = new System.Drawing.Size(227, 20);
             this.textBoxProcedurePatientsFirstName.TabIndex = 103;
             this.textBoxProcedurePatientsFirstName.Validating += new System.ComponentModel.CancelEventHandler(this.textBox_Validating);
-            // 
-            // textBoxProcedureLocation
-            // 
-            this.textBoxProcedureLocation.Location = new System.Drawing.Point(148, 75);
-            this.textBoxProcedureLocation.Name = "textBoxProcedureLocation";
-            this.textBoxProcedureLocation.Size = new System.Drawing.Size(205, 20);
-            this.textBoxProcedureLocation.TabIndex = 102;
-            this.textBoxProcedureLocation.Validating += new System.ComponentModel.CancelEventHandler(this.textBox_Validating);
             // 
             // textBoxProcedurePages
             // 
             this.textBoxProcedurePages.Enabled = false;
             this.textBoxProcedurePages.Location = new System.Drawing.Point(148, 183);
             this.textBoxProcedurePages.Name = "textBoxProcedurePages";
-            this.textBoxProcedurePages.Size = new System.Drawing.Size(205, 20);
+            this.textBoxProcedurePages.Size = new System.Drawing.Size(297, 20);
             this.textBoxProcedurePages.TabIndex = 106;
             // 
             // labelProcedurePages
@@ -128,20 +114,12 @@
             this.labelProcedurePages.TabIndex = 2;
             this.labelProcedurePages.Text = "Page(s)";
             // 
-            // textBoxProcedureDoctor
-            // 
-            this.textBoxProcedureDoctor.Location = new System.Drawing.Point(148, 48);
-            this.textBoxProcedureDoctor.Name = "textBoxProcedureDoctor";
-            this.textBoxProcedureDoctor.Size = new System.Drawing.Size(205, 20);
-            this.textBoxProcedureDoctor.TabIndex = 101;
-            this.textBoxProcedureDoctor.Validating += new System.ComponentModel.CancelEventHandler(this.textBox_Validating);
-            // 
             // dateTimePickerProcedure
             // 
             this.dateTimePickerProcedure.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateTimePickerProcedure.Location = new System.Drawing.Point(249, 21);
+            this.dateTimePickerProcedure.Location = new System.Drawing.Point(326, 21);
             this.dateTimePickerProcedure.Name = "dateTimePickerProcedure";
-            this.dateTimePickerProcedure.Size = new System.Drawing.Size(104, 20);
+            this.dateTimePickerProcedure.Size = new System.Drawing.Size(118, 20);
             this.dateTimePickerProcedure.TabIndex = 100;
             this.dateTimePickerProcedure.ValueChanged += new System.EventHandler(this.dateTimePickerProcedure_ValueChanged);
             // 
@@ -150,7 +128,7 @@
             this.textBoxProcedureDate.Enabled = false;
             this.textBoxProcedureDate.Location = new System.Drawing.Point(148, 21);
             this.textBoxProcedureDate.Name = "textBoxProcedureDate";
-            this.textBoxProcedureDate.Size = new System.Drawing.Size(95, 20);
+            this.textBoxProcedureDate.Size = new System.Drawing.Size(128, 20);
             this.textBoxProcedureDate.TabIndex = 5;
             // 
             // labelProcedureName
@@ -209,7 +187,7 @@
             // 
             // buttonSetup
             // 
-            this.buttonSetup.Location = new System.Drawing.Point(388, 243);
+            this.buttonSetup.Location = new System.Drawing.Point(469, 245);
             this.buttonSetup.Name = "buttonSetup";
             this.buttonSetup.Size = new System.Drawing.Size(54, 23);
             this.buttonSetup.TabIndex = 305;
@@ -220,7 +198,7 @@
             // buttonSaveConciergeProcedure
             // 
             this.buttonSaveConciergeProcedure.Enabled = false;
-            this.buttonSaveConciergeProcedure.Location = new System.Drawing.Point(12, 243);
+            this.buttonSaveConciergeProcedure.Location = new System.Drawing.Point(35, 243);
             this.buttonSaveConciergeProcedure.Name = "buttonSaveConciergeProcedure";
             this.buttonSaveConciergeProcedure.Size = new System.Drawing.Size(161, 23);
             this.buttonSaveConciergeProcedure.TabIndex = 303;
@@ -230,7 +208,7 @@
             // 
             // buttonSaveProcedure
             // 
-            this.buttonSaveProcedure.Location = new System.Drawing.Point(179, 243);
+            this.buttonSaveProcedure.Location = new System.Drawing.Point(205, 243);
             this.buttonSaveProcedure.Name = "buttonSaveProcedure";
             this.buttonSaveProcedure.Size = new System.Drawing.Size(127, 23);
             this.buttonSaveProcedure.TabIndex = 304;
@@ -241,7 +219,7 @@
             // checkBoxView
             // 
             this.checkBoxView.AutoSize = true;
-            this.checkBoxView.Location = new System.Drawing.Point(316, 247);
+            this.checkBoxView.Location = new System.Drawing.Point(338, 247);
             this.checkBoxView.Name = "checkBoxView";
             this.checkBoxView.Size = new System.Drawing.Size(49, 17);
             this.checkBoxView.TabIndex = 306;
@@ -249,29 +227,81 @@
             this.checkBoxView.UseVisualStyleBackColor = true;
             this.checkBoxView.CheckedChanged += new System.EventHandler(this.checkBoxView_CheckedChanged);
             // 
+            // comboBoxSuffix
+            // 
+            this.comboBoxSuffix.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboBoxSuffix.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.comboBoxSuffix.FormattingEnabled = true;
+            this.comboBoxSuffix.ItemHeight = 13;
+            this.comboBoxSuffix.Location = new System.Drawing.Point(326, 50);
+            this.comboBoxSuffix.MaxLength = 12;
+            this.comboBoxSuffix.Name = "comboBoxSuffix";
+            this.comboBoxSuffix.Size = new System.Drawing.Size(118, 21);
+            this.comboBoxSuffix.TabIndex = 107;
+            this.comboBoxSuffix.Enter += new System.EventHandler(this.comboBoxSuffix_Enter);
+            // 
+            // comboBoxProcedureName
+            // 
+            this.comboBoxProcedureName.FormattingEnabled = true;
+            this.comboBoxProcedureName.Location = new System.Drawing.Point(148, 157);
+            this.comboBoxProcedureName.Name = "comboBoxProcedureName";
+            this.comboBoxProcedureName.Size = new System.Drawing.Size(296, 21);
+            this.comboBoxProcedureName.TabIndex = 108;
+            this.comboBoxProcedureName.Enter += new System.EventHandler(this.comboBoxProcedureName_Enter);
+            // 
+            // comboBoxLocation
+            // 
+            this.comboBoxLocation.FormattingEnabled = true;
+            this.comboBoxLocation.Location = new System.Drawing.Point(148, 75);
+            this.comboBoxLocation.Name = "comboBoxLocation";
+            this.comboBoxLocation.Size = new System.Drawing.Size(296, 21);
+            this.comboBoxLocation.TabIndex = 109;
+            this.comboBoxLocation.Enter += new System.EventHandler(this.comboBoxLocation_Enter);
+            // 
+            // comboBoxDoctor
+            // 
+            this.comboBoxDoctor.FormattingEnabled = true;
+            this.comboBoxDoctor.Location = new System.Drawing.Point(148, 51);
+            this.comboBoxDoctor.Name = "comboBoxDoctor";
+            this.comboBoxDoctor.Size = new System.Drawing.Size(172, 21);
+            this.comboBoxDoctor.TabIndex = 110;
+            this.comboBoxDoctor.Enter += new System.EventHandler(this.comboBoxDoctor_Enter);
+            // 
             // dragger1
             // 
             this.dragger1.BackColor = System.Drawing.SystemColors.Control;
             this.dragger1.Dragging = false;
             this.dragger1.ForeColor = System.Drawing.SystemColors.ControlDark;
             this.dragger1.Full = false;
-            this.dragger1.Location = new System.Drawing.Point(388, 33);
+            this.dragger1.Location = new System.Drawing.Point(469, 33);
             this.dragger1.Name = "dragger1";
             this.dragger1.Size = new System.Drawing.Size(54, 182);
             this.dragger1.TabIndex = 308;
+            // 
+            // buttonGetName
+            // 
+            this.buttonGetName.Location = new System.Drawing.Point(381, 102);
+            this.buttonGetName.Name = "buttonGetName";
+            this.buttonGetName.Size = new System.Drawing.Size(63, 49);
+            this.buttonGetName.TabIndex = 111;
+            this.buttonGetName.Text = "Get Name...";
+            this.buttonGetName.UseVisualStyleBackColor = true;
+            this.buttonGetName.Click += new System.EventHandler(this.buttonGetName_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(456, 278);
+            this.ClientSize = new System.Drawing.Size(535, 278);
             this.Controls.Add(this.dragger1);
             this.Controls.Add(this.checkBoxView);
             this.Controls.Add(this.buttonSaveProcedure);
             this.Controls.Add(this.buttonSaveConciergeProcedure);
             this.Controls.Add(this.buttonSetup);
             this.Controls.Add(this.groupBox1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "PDF Handler";
             this.TopMost = true;
@@ -296,12 +326,9 @@
         private System.Windows.Forms.Label labelProcedureDate;
         private System.Windows.Forms.TextBox textBoxProcedurePatientsLastName;
         private System.Windows.Forms.TextBox textBoxProcedurePatientsFirstName;
-        private System.Windows.Forms.TextBox textBoxProcedureLocation;
-        private System.Windows.Forms.TextBox textBoxProcedureDoctor;
         private System.Windows.Forms.DateTimePicker dateTimePickerProcedure;
         private System.Windows.Forms.TextBox textBoxProcedureDate;
         private System.Windows.Forms.Label labelProcedurePages;
-        private System.Windows.Forms.TextBox textBoxProcedureName;
         private System.Windows.Forms.Label labelProcedureName;
         private System.Windows.Forms.Button buttonSetup;
         private System.Windows.Forms.TextBox textBoxProcedurePages;
@@ -309,6 +336,11 @@
         private System.Windows.Forms.Button buttonSaveProcedure;
         private System.Windows.Forms.CheckBox checkBoxView;
         private Dragger dragger1;
+        private System.Windows.Forms.ComboBox comboBoxSuffix;
+        private System.Windows.Forms.ComboBox comboBoxProcedureName;
+        private System.Windows.Forms.ComboBox comboBoxDoctor;
+        private System.Windows.Forms.ComboBox comboBoxLocation;
+        private System.Windows.Forms.Button buttonGetName;
 
     }
 }

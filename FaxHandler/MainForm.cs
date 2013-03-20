@@ -49,14 +49,19 @@ namespace FaxHandler
                     if (result == DialogResult.OK)
                     {
                         if (!Directory.Exists(dialog.SelectedPath))
+                        {
                             ShowError("That is not a valid directory, please try again.");
-                            break;
+                            continue;
+                        }
+                        conciergeLocation = dialog.SelectedPath;
+                        break;
                     }
                     else // cancel
                     {
                         ShowWarning("This program cannot continue until you set the location of the Concierge directory.\n" +
                             "The program will now quit.");
-                        Application.Exit();
+                        System.Threading.Thread.CurrentThread.Abort();
+                        return;
                     }
                 }
                 Properties.Settings.Default.ConciergeLocation = conciergeLocation;
@@ -101,7 +106,14 @@ namespace FaxHandler
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             CloseDocument();
-            timer.Stop();
+            try
+            {
+                timer.Stop();
+            }
+            catch (Exception )
+            {
+                // don't care
+            }
         }
         private void textBoxPages_Validating(object sender, CancelEventArgs e)
         {
@@ -114,10 +126,10 @@ namespace FaxHandler
             if (suspendValidation)
                 return;
             string val = textBox.Text.Trim();
-            Regex r = new Regex(@"\-+");
+            Regex r = new Regex(@"\-{2}");
             if (r.IsMatch(val))
             {
-                ShowError("No embedded hyphens are allowed");
+                ShowError("No embedded double hyphens are allowed");
                 e.Cancel = true;
             }
             else if (Regex.IsMatch(val,@"<+|>+|:+|/+|\\+|\|+|\?+|\*+|""+"))
@@ -163,9 +175,9 @@ namespace FaxHandler
             else
                 return buttonSaveProcedure;
         }
-        TextBox GetTextBoxDoctor()
+        ComboBox GetTextBoxDoctor()
         {
-            return textBoxProcedureDoctor;
+            return comboBoxDoctor;
         }
         TextBox GetTextBoxPages()
         {
@@ -175,9 +187,9 @@ namespace FaxHandler
         {
             return textBoxProcedureDate;
         }
-        TextBox GetTextBoxLocation()
+        ComboBox GetComboBoxLocation()
         {
-            return textBoxProcedureLocation;
+            return comboBoxLocation;
         }
         TextBox GetTextBoxPatientsFirstName()
         {
@@ -201,12 +213,13 @@ namespace FaxHandler
         {
             string[] tempParts = WindowsIdentity.GetCurrent().Name.Split('\\');
             string userName = tempParts[1];
-            string fileName = GetTextBoxDate().Text
-                + "--PROCEDURE--" + textBoxProcedureName.Text
-                    + "--LOCATION--" + GetTextBoxLocation().Text 
-                    + "--DOCTOR--" + GetTextBoxDoctor().Text
-                    + "--PATIENT--" + PatientsDirectoryName().TrimAll() 
-                    + "--USER--" + userName
+            string date = GetTextBoxDate().Text;
+            string fileName = date
+                + "--" + comboBoxProcedureName.Text
+                    + "--" + GetComboBoxLocation().Text 
+                    + "--" + GetTextBoxDoctor().Text
+                    + "--" + PatientsDirectoryName().TrimAll() 
+                    + "--" + userName
                     + suffix + ".PDF";
             return fileName;
         }
@@ -277,7 +290,8 @@ namespace FaxHandler
         }
         string DateToString(DateTime dateTime)
         {
-            return string.Format("{0:D2}-{1:D2}-{2}", dateTime.Month, dateTime.Day, dateTime.Year);
+            return dateTime.ToString("yyyy-MMM-dd");
+            //return string.Format("{0:D2}-{1:D2}-{2}", dateTime.Month, dateTime.Day, dateTime.Year);
         }
         string[] GetPredefinedProcedures()
         {
@@ -295,7 +309,7 @@ namespace FaxHandler
             Properties.Settings.Default.Save();
             var collection = new AutoCompleteStringCollection();
             collection.AddRange(procedures);
-            textBoxProcedureName.AutoCompleteCustomSource = collection;
+            comboBoxProcedureName.AutoCompleteCustomSource = collection;
         }
         void AddPredefinedProcedure(string newProcedure)
         {
@@ -316,7 +330,7 @@ namespace FaxHandler
             AutoCompleteStringCollection collection = new AutoCompleteStringCollection();
             string[] definedProcedureNames = GetPredefinedProcedures();
             collection.AddRange(definedProcedureNames);
-            textBoxProcedureName.AutoCompleteCustomSource = collection;
+            comboBoxProcedureName.AutoCompleteCustomSource = collection;
         }
         bool IsPdfFileName(string fileName)
         {
@@ -396,7 +410,7 @@ namespace FaxHandler
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
-                if(files != null && files.Length == 1)
+                if(files != null && files.Length == 1 && IsPdfFileName(files[0]))
                     e.Effect = DragDropEffects.Copy;
             }
             else
@@ -472,7 +486,7 @@ namespace FaxHandler
                     trimmedDocument.Dispose();
                 }
             }
-            catch (Exception ex)
+            catch (Exception )
             {
                 result = null;
             }
@@ -484,7 +498,7 @@ namespace FaxHandler
             if (GetTextBoxPages().Text.Trim().Length > 0
                 && GetTextBoxDate().Text.Trim().Length > 0
                 && GetTextBoxDoctor().Text.Trim().Length > 0
-                && GetTextBoxLocation().Text.Trim().Length > 0
+                && GetComboBoxLocation().Text.Trim().Length > 0
                 && GetTextBoxPatientsFirstName().Text.Trim().Length > 0
                 && GetTextBoxPatientsLastName().Text.Trim().Length > 0
                 && ValidPageRange(document.Pages))
@@ -774,7 +788,7 @@ namespace FaxHandler
                         Process.Start("explorer.exe", "/select,\"" + destinationPath + "\"");
                     System.Threading.Thread.Sleep(1000);
                 }
-                AddPredefinedProcedure(textBoxProcedureName.Text);
+                AddPredefinedProcedure(comboBoxProcedureName.Text);
                 if (concierge)
                 {
                     UpdateDirectoryLabels(destinationPath);
@@ -816,5 +830,85 @@ namespace FaxHandler
             return result;
         }
         #endregion
+
+        private void comboBoxSuffix_Enter(object sender, EventArgs e)
+        {
+            comboBoxSuffix.Items.Clear();
+            comboBoxSuffix.Items.Add("");
+            try
+            {
+                using (conciergeEntities ent = new conciergeEntities())
+                {
+                    foreach (string s in (from s in ent.suffix orderby s.value select s.value))
+                        comboBoxSuffix.Items.Add(s);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(caption: "Error", text: "Could not get suffix list from the database. The database reported:"+ex.Message, icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
+            }
+        }
+
+        private void comboBoxDoctor_Enter(object sender, EventArgs e)
+        {
+            comboBoxDoctor.Items.Clear();
+            try
+            {
+                using (conciergeEntities ent = new conciergeEntities())
+                {
+                    foreach (string s in (from s in ent.doctor orderby s.shortname select s.shortname))
+                    {
+                        comboBoxDoctor.Items.Add(s);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(caption: "Error", text: "Could not get doctor list from the database. The database reported:" + ex.Message, icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
+            }
+        }
+
+        private void comboBoxLocation_Enter(object sender, EventArgs e)
+        {
+            comboBoxLocation.Items.Clear();
+            try
+            {
+                using (conciergeEntities ent = new conciergeEntities())
+                {
+                    foreach (string s in (from s in ent.location  orderby s.value select s.value))
+                    {
+                        comboBoxDoctor.Items.Add(s);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(caption: "Error", text: "Could not get location list from the database. The database reported:" + ex.Message, icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
+            }
+        }
+
+        private void comboBoxProcedureName_Enter(object sender, EventArgs e)
+        {
+            comboBoxProcedureName.Items.Clear();
+            try
+            {
+                using (conciergeEntities ent = new conciergeEntities())
+                {
+                    foreach (string s in (from s in ent.procedure orderby s.value select s.value))
+                    {
+                        comboBoxDoctor.Items.Add(s);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(caption: "Error", text: "Could not get location list from the database. The database reported:" + ex.Message, icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
+            }
+        }
+
+        private void buttonGetName_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

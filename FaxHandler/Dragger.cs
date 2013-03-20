@@ -61,7 +61,6 @@ namespace FaxHandler
                 return;
             if (!Full)
                 return;
-            string filename;
             MainForm mainForm = (MainForm)Parent;
             FileInfo fileInfo = mainForm.GetDraggableFileInfo();
             string[] filenames = { fileInfo.FullName };

@@ -122,7 +122,7 @@ namespace FaxHandler.PDF
                 AVDocument.Open(this.fileName, "Copy of " + fileName);
                 PDDoc();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
                 fileName = null;
                 throw;
