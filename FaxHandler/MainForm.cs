@@ -56,7 +56,8 @@ namespace FaxHandler
                     {
                         ShowWarning("This program cannot continue until you set the location of the Concierge directory.\n" +
                             "The program will now quit.");
-                        Application.Exit();
+                        System.Threading.Thread.CurrentThread.Abort();
+                        return;
                     }
                 }
                 Properties.Settings.Default.ConciergeLocation = conciergeLocation;
@@ -101,7 +102,14 @@ namespace FaxHandler
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             CloseDocument();
-            timer.Stop();
+            try
+            {
+                timer.Stop();
+            }
+            catch (Exception ex)
+            {
+                // don't care
+            }
         }
         private void textBoxPages_Validating(object sender, CancelEventArgs e)
         {
@@ -398,7 +406,7 @@ namespace FaxHandler
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
             {
                 string[] files = e.Data.GetData(DataFormats.FileDrop) as string[];
-                if(files != null && files.Length == 1)
+                if(files != null && files.Length == 1 && IsPdfFileName(files[0]))
                     e.Effect = DragDropEffects.Copy;
             }
             else
