@@ -49,8 +49,12 @@ namespace FaxHandler
                     if (result == DialogResult.OK)
                     {
                         if (!Directory.Exists(dialog.SelectedPath))
+                        {
                             ShowError("That is not a valid directory, please try again.");
-                            break;
+                            continue;
+                        }
+                        conciergeLocation = dialog.SelectedPath;
+                        break;
                     }
                     else // cancel
                     {
