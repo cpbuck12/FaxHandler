@@ -87,12 +87,12 @@ namespace FaxHandler
 
         private void textBoxProcedures_Validating(object sender, CancelEventArgs e)
         {
-            Regex r = new Regex(@"\s+");
+            Regex r = new Regex(@"\-{2}");
             if ((from line in textBoxProcedures.Lines
                  where r.IsMatch(line.Trim())
                  select line).Count() > 0)
             {
-                MessageBox.Show("No embedded spaces");
+                MessageBox.Show("No embedded double dashes");
                 e.Cancel = true;
                 return;
             }
