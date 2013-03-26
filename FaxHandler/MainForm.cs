@@ -163,6 +163,16 @@ namespace FaxHandler
             UpdateSaveButtons();
         }
         #endregion
+        #region Properties
+        public string LastName
+        {
+            get { return GetTextBoxPatientsLastName().Text; }
+        }
+        public string FirstName
+        {
+            get { return GetTextBoxPatientsFirstName().Text; }
+        }
+        #endregion
         #region Control Accessors
         DateTimePicker GetDateTimePicker()
         {
@@ -494,13 +504,13 @@ namespace FaxHandler
         }
         void UpdateSaveButtons()
         {
-
+            bool patientNameFilled = GetTextBoxPatientsFirstName().Text.Trim().Length > 0 && GetTextBoxPatientsLastName().Text.Trim().Length > 0;
+            bool doctorNameFilled = GetTextBoxDoctor().Text.Trim().Length > 0;
             if (GetTextBoxPages().Text.Trim().Length > 0
                 && GetTextBoxDate().Text.Trim().Length > 0
-                && GetTextBoxDoctor().Text.Trim().Length > 0
+                && doctorNameFilled
                 && GetComboBoxLocation().Text.Trim().Length > 0
-                && GetTextBoxPatientsFirstName().Text.Trim().Length > 0
-                && GetTextBoxPatientsLastName().Text.Trim().Length > 0
+                && patientNameFilled
                 && ValidPageRange(document.Pages))
             {
                 dragger1.Full = GetButtonSave(concierge: true).Enabled = GetButtonSave(concierge: false).Enabled = true;
@@ -509,6 +519,8 @@ namespace FaxHandler
             {
                 dragger1.Full = GetButtonSave(concierge: true).Enabled = GetButtonSave(concierge: false).Enabled = false;
             }
+            buttonCreateRelease.Enabled = patientNameFilled && doctorNameFilled;
+            buttonGetSignature.Enabled = patientNameFilled;
         }
 
         #endregion
@@ -909,6 +921,30 @@ namespace FaxHandler
         private void buttonGetName_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void labelProcedurePatientFirstName_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void comboBoxSuffix_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string val = comboBoxSuffix.SelectedItem as string;
+            if (val.Trim() == string.Empty)
+                return;
+            comboBoxDoctor.Text += "," + val;
+        }
+
+        private void buttonGetSignature_Click(object sender, EventArgs e)
+        {
+            GetSignatureForm form = new GetSignatureForm(this);
+            form.ShowDialog(this);
         }
     }
 }
