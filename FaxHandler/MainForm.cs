@@ -15,6 +15,7 @@ using System.Security;
 using System.Diagnostics;
 using Acrobat;
 using System.Security.Principal;
+using System.Collections;
 
 namespace FaxHandler
 {
@@ -504,8 +505,10 @@ namespace FaxHandler
         }
         void UpdateSaveButtons()
         {
+            UpdateSelectedPatient();
             bool patientNameFilled = GetTextBoxPatientsFirstName().Text.Trim().Length > 0 && GetTextBoxPatientsLastName().Text.Trim().Length > 0;
             bool doctorNameFilled = GetTextBoxDoctor().Text.Trim().Length > 0;
+            
             if (GetTextBoxPages().Text.Trim().Length > 0
                 && GetTextBoxDate().Text.Trim().Length > 0
                 && doctorNameFilled
@@ -520,7 +523,8 @@ namespace FaxHandler
                 dragger1.Full = GetButtonSave(concierge: true).Enabled = GetButtonSave(concierge: false).Enabled = false;
             }
             buttonCreateRelease.Enabled = patientNameFilled && doctorNameFilled;
-            buttonGetSignature.Enabled = patientNameFilled;
+            buttonGetSignature.Enabled = comboBoxPatients.SelectedIndex >= 0;
+
         }
 
         #endregion
@@ -843,78 +847,179 @@ namespace FaxHandler
         }
         #endregion
 
+        private void SetStatus(string status = null)
+        {
+            //statusStrip.Text = status;
+            textBoxStatus.Text = status ?? string.Empty;
+            //toolStripStatusLabel1.Text = "text";
+            //this.toolStripStatusLabel1.Text = status;
+        }
         private void comboBoxSuffix_Enter(object sender, EventArgs e)
         {
             comboBoxSuffix.Items.Clear();
+            if (comboBoxSuffix.Items.Count > 0)
+                return; // reentrancy issue
             comboBoxSuffix.Items.Add("");
-            try
+            SetStatus();
+            Db.Db db = Db.Db.Instance();
+            Hashtable result = db.GetSuffixes();
+            if (result["status"] as string == "ok")
             {
-                using (conciergeEntities ent = new conciergeEntities())
+                var items = result["data"] as List<Hashtable>;
+                foreach (var item in items)
                 {
-                    foreach (string s in (from s in ent.suffix orderby s.value select s.value))
-                        comboBoxSuffix.Items.Add(s);
+                    comboBoxSuffix.Items.Add(item["value"] as string);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(caption: "Error", text: "Could not get suffix list from the database. The database reported:"+ex.Message, icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
+                SetStatus("While trying to get the suffix list, the database reported:" + result["reason"]);
+            }
+        }
+        class Minidoctor
+        {
+            public Hashtable values;
+            public Minidoctor(Hashtable values)
+            {
+                this.values = values;
+            }
+            public override string ToString()
+            {
+                return values["shortname"] as string;
             }
         }
 
         private void comboBoxDoctor_Enter(object sender, EventArgs e)
         {
             comboBoxDoctor.Items.Clear();
-            try
+            if (comboBoxDoctor.Items.Count > 0)
+                return; // reentrancy issue
+            SetStatus();
+            Db.Db db = Db.Db.Instance();
+            Hashtable result = db.GetDoctors();
+            if (result["status"] as string == "ok")
             {
-                using (conciergeEntities ent = new conciergeEntities())
+                var items = result["data"] as List<Hashtable>;
+                foreach (var item in items)
                 {
-                    foreach (string s in (from s in ent.doctor orderby s.shortname select s.shortname))
-                    {
-                        comboBoxDoctor.Items.Add(s);
-                    }
+                    comboBoxDoctor.Items.Add(new Minidoctor(item));
                 }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(caption: "Error", text: "Could not get doctor list from the database. The database reported:" + ex.Message, icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
+                SetStatus("While trying to get the doctor list, the database reported:" + result["reason"]);
             }
         }
 
         private void comboBoxLocation_Enter(object sender, EventArgs e)
         {
             comboBoxLocation.Items.Clear();
-            try
+            if (comboBoxLocation.Items.Count > 0)
+                return; // reentrancy issue
+            SetStatus();
+            Db.Db db = Db.Db.Instance();
+            Hashtable result = db.GetLocations();
+            if (result["status"] as string == "ok")
             {
-                using (conciergeEntities ent = new conciergeEntities())
+                List<Hashtable> items = result["data"] as List<Hashtable>;
+                foreach (var item in items)
                 {
-                    foreach (string s in (from s in ent.location  orderby s.value select s.value))
-                    {
-                        comboBoxDoctor.Items.Add(s);
-                    }
+                    comboBoxLocation.Items.Add(item["value"] as string);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(caption: "Error", text: "Could not get location list from the database. The database reported:" + ex.Message, icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
+                SetStatus("While trying to get the location list, the database reported:" + result["reason"]);
             }
         }
 
         private void comboBoxProcedureName_Enter(object sender, EventArgs e)
         {
             comboBoxProcedureName.Items.Clear();
-            try
+            if (comboBoxProcedureName.Items.Count > 0)
+                return; // reentrancy issue;
+            SetStatus();
+            Db.Db db = Db.Db.Instance();
+            Hashtable result = db.GetProcedures();
+            if (result["status"] as string == "ok")
             {
-                using (conciergeEntities ent = new conciergeEntities())
+                List<Hashtable> items = result["data"] as List<Hashtable>;
+                foreach (var item in items)
                 {
-                    foreach (string s in (from s in ent.procedure orderby s.value select s.value))
-                    {
-                        comboBoxDoctor.Items.Add(s);
-                    }
+                    comboBoxProcedureName.Items.Add(item["value"] as string);
                 }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show(caption: "Error", text: "Could not get location list from the database. The database reported:" + ex.Message, icon: MessageBoxIcon.Error, buttons: MessageBoxButtons.OK);
+                SetStatus("While trying to get the procedure list, the database reported:" + result["reason"]);
+            }
+        }
+        class Minipatient
+        {
+            public Hashtable values;
+            public Minipatient(Hashtable values)
+            {
+                this.values = values;
+            }
+            public override string ToString()
+            {
+                return string.Format("{0},{1}", values["last"],values["first"]);
+            }
+        }
+
+        class Minispecialty
+        {
+            Hashtable values;
+            public Minispecialty(Hashtable values)
+            {
+                this.values = values;
+            }
+            public override string ToString()
+            {
+                string spec = values["specialty"] as string;
+                string subspec = (values["subspecialty"] ?? "") as string;
+                if (subspec != string.Empty)
+                    return string.Format("{0}/{1}", spec, subspec);
+                return spec;
+            }
+        }
+        private void comboBoxSpecialty_Enter(object sender, EventArgs e)
+        {
+            comboBoxSpecialty.Items.Clear();
+            if (comboBoxSpecialty.Items.Count > 0)
+                return; // reentrancy issue
+            SetStatus();
+            Db.Db db = Db.Db.Instance();
+            Hashtable result = db.GetSpecialties();
+            if (result["status"] as string == "ok")
+            {
+                List<Hashtable> items = result["data"] as List<Hashtable>;
+                foreach (var item in items)
+                {
+                    comboBoxSpecialty.Items.Add(new Minispecialty(item));
+                }
+            }
+        }
+
+        private void comboBoxPatients_Enter(object sender, EventArgs e)
+        {
+            comboBoxPatients.Items.Clear();
+            if (comboBoxPatients.Items.Count > 0)
+                return; // reentrancy issue;
+            SetStatus();
+            Db.Db db = Db.Db.Instance();
+            Hashtable result = db.GetPatients();
+            if (result["status"] as string == "ok")
+            {
+                List<Hashtable> items = result["data"] as List<Hashtable>;
+                foreach (var item in items)
+                {
+                    comboBoxPatients.Items.Add(new Minipatient(item));
+                }
+            }
+            else
+            {
+                SetStatus("While trying to get the patient list, the database reported:" + result["reason"]);
             }
         }
 
@@ -935,16 +1040,113 @@ namespace FaxHandler
 
         private void comboBoxSuffix_SelectedIndexChanged(object sender, EventArgs e)
         {
+            comboBoxDoctor.Text = comboBoxDoctor.Text.Trim();
             string val = comboBoxSuffix.SelectedItem as string;
             if (val.Trim() == string.Empty)
                 return;
+            if (comboBoxDoctor.MaxLength > 0 && (comboBoxDoctor.Text.Length + val.Length + 1) > comboBoxDoctor.MaxLength)
+            {
+                SetStatus("Adding the suffix would make the doctor name too long");
+                return;
+            }
             comboBoxDoctor.Text += "," + val;
         }
 
         private void buttonGetSignature_Click(object sender, EventArgs e)
         {
+            Db.Db db = Db.Db.Instance();
+            Hashtable parameters = new Hashtable();
+            Hashtable result;
+            var p = comboBoxPatients.SelectedItem as Minipatient;
+            parameters["patient_id"] = p.values["id"];
+            result = db.GetStamp(parameters);
+            if (result["status"] == "error")
+            {
+                SetStatus("Error checking preexisting signature.  More info:" + result["reason"]);
+                return;
+            }
+            if (result["image"] != null)
+            {
+                DialogResult dr = MessageBox.Show(text: "The patient already has a signature.  Replace it?", caption: "Warning", owner: this, buttons: MessageBoxButtons.OKCancel);
+                if (dr == DialogResult.Cancel)
+                    return;
+            }
             GetSignatureForm form = new GetSignatureForm(this);
             form.ShowDialog(this);
+            if (form.Image != null)
+            {
+                parameters = new Hashtable();
+                parameters["image"] = form.Image;
+                parameters["patient_id"] = (int)p.values["id"];
+                result = db.AddStamp(parameters);
+                if (result["status"] == "error")
+                {
+                    SetStatus("While trying to set the signature:"+result["reason"]);
+                }
+            }
+            form.Dispose();
         }
+
+        private void comboBoxPatients_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            ComboBox cb = sender as ComboBox;
+            if (e.Index == -1)
+                return;
+            Minipatient mp = cb.Items[e.Index] as Minipatient;
+            Hashtable p = mp.values;
+            e.DrawBackground();
+            e.DrawFocusRectangle();
+            string name = string.Format("{0},{1}",p["last"],p["first"]);
+            e.Graphics.DrawString(name, cb.Font, new SolidBrush(e.ForeColor), e.Bounds);
+        }
+
+        private void comboBoxPatients_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            int i = comboBoxPatients.SelectedIndex;
+            if (i < 0)
+            {
+                return;
+            }
+            Minipatient mp = comboBoxPatients.Items[i] as Minipatient;
+            Hashtable p = mp.values;
+            GetTextBoxPatientsFirstName().Text = p["first"] as string;
+            GetTextBoxPatientsLastName().Text = p["last"] as string;
+        }
+
+        private void UpdateSelectedPatient()
+        {
+            if (comboBoxPatients.Focused)
+                return;
+            if (textBoxProcedurePatientsFirstName.Text.Trim() != string.Empty && textBoxProcedurePatientsLastName.Text.Trim() != string.Empty)
+            {
+                string searchValue = string.Format("{0},{1}",textBoxProcedurePatientsLastName.Text.Trim(),textBoxProcedurePatientsFirstName.Text.Trim());
+                foreach (var o in comboBoxPatients.Items)
+                {
+                    if (o.ToString() == searchValue)
+                    {
+                        comboBoxPatients.SelectedIndex = comboBoxPatients.Items.IndexOf(o);
+                        return;
+                    }
+                }
+            }
+            comboBoxPatients.SelectedIndex = -1;
+        }
+        private void textBoxProcedurePatientsLastName_TextChanged(object sender, EventArgs e)
+        {
+            //if (textBoxProcedurePatientsLastName.Focused)
+//                comboBoxPatients.SelectedIndex = -1;
+        }
+
+        private void textBoxProcedurePatientsFirstName_TextChanged(object sender, EventArgs e)
+        {
+  //          if (textBoxProcedurePatientsFirstName.Focused)
+    //            comboBoxPatients.SelectedIndex = -1;
+        }
+
+        private void buttonClear_Click(object sender, EventArgs e)
+        {
+            SetStatus();
+        }
+
     }
 }

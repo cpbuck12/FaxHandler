@@ -31,6 +31,7 @@ namespace FaxHandler
     public partial class GetSignatureForm : Form
     {
         const int defaultInk = 5;
+        Image image = null;
         // signature specs:
         // 4.3" X 1.4"
         // 410 DPI resolution
@@ -48,6 +49,13 @@ namespace FaxHandler
 //            signatureControl.SetImageYSize(signatureControl.GetTabletLogicalYSize());
             numericUpDownInk.Value = InkSize = defaultInk;
             EnableReading(true);
+        }
+        public Image Image
+        {
+            get
+            {
+                return image;
+            }
         }
         private int InkSize
         {
@@ -88,7 +96,7 @@ namespace FaxHandler
             int ysize = signatureControl.GetImageYSize();
             xsize = signatureControl.GetTabletLogicalXSize();
             ysize = signatureControl.GetTabletLogicalYSize();
-            Image image = signatureControl.GetSigImage();
+            image = signatureControl.GetSigImage();
             
 
             //image.Save(ms, System.Drawing.Imaging.ImageFormat.Bmp);
@@ -98,6 +106,11 @@ namespace FaxHandler
         private void numericUpDownInk_ValueChanged(object sender, EventArgs e)
         {
             InkSize = (int) numericUpDownInk.Value;
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }
