@@ -506,6 +506,8 @@ namespace FaxHandler
         void UpdateSaveButtons()
         {
             UpdateSelectedPatient();
+            UpdateAddDoctorButton();
+            UpdateAddPatientButton();
             bool patientNameFilled = GetTextBoxPatientsFirstName().Text.Trim().Length > 0 && GetTextBoxPatientsLastName().Text.Trim().Length > 0;
             bool doctorNameFilled = GetTextBoxDoctor().Text.Trim().Length > 0;
             
@@ -522,7 +524,7 @@ namespace FaxHandler
             {
                 dragger1.Full = GetButtonSave(concierge: true).Enabled = GetButtonSave(concierge: false).Enabled = false;
             }
-            buttonCreateRelease.Enabled = patientNameFilled && doctorNameFilled;
+            buttonAcceptReleaseResponse.Enabled = patientNameFilled && doctorNameFilled;
             buttonGetSignature.Enabled = comboBoxPatients.SelectedIndex >= 0;
 
         }
@@ -621,136 +623,77 @@ namespace FaxHandler
             string startingDirectory = null;
             DirectoryInfo directoryInfoMain;
             DirectoryInfo[] dirs;
-
-            try
-            {
-                directoryInfoMain = new DirectoryInfo(concierge ? Properties.Settings.Default.ConciergeLocation : Properties.Settings.Default.LastSavedDirectory);
-            }
-            catch (SecurityException /*securityException*/)
-            {
-                ShowError("You do not have permission to access " 
-                    + (concierge ? "the Concierge directory" : Properties.Settings.Default.LastSavedDirectory));
-                return;
-            }
-            catch (ArgumentException /*argumentException*/)
-            {
-                ShowError("There is an invalid character in " 
-                    + (concierge ? "either the name of the Concierge directory, or the name of a directory above it" : Properties.Settings.Default.LastSavedDirectory));
-                return;
-            }
-            catch (PathTooLongException /*pathTooLongException*/)
-            {
-                ShowError((concierge ? "The Concierge folder is too far deep.  Try moving it to a higher directory"
-                    : Properties.Settings.Default.LastSavedDirectory + " is too far deep"));
-                return;
-            }
-            if (directoryInfoMain.Exists)
-            {
-                startingDirectory = directoryInfoMain.FullName;
-                if (concierge)
-                {
-                    try
-                    {
-                        dirs = directoryInfoMain.GetDirectories(PatientsDirectoryName(),SearchOption.TopDirectoryOnly);
-                    }
-                    catch (ArgumentException argumentException)
-                    {
-                        ShowError("The patient's name contains invalid characters.\n" + argumentException.Message);
-                        return;
-                    }
-                    catch (DirectoryNotFoundException directoryNotFoundException)
-                    {
-                        ShowError("It was not possible to read the Concierge directory\n" + directoryNotFoundException.Message);
-                        return;
-                    }
-                    catch (UnauthorizedAccessException unauthorizedAccessException)
-                    {
-                        ShowError("Permission denied reading the Concierge directory\n" + unauthorizedAccessException.Message);
-                        return;
-                    }
-                    if (dirs.Length == 1)
-                    {
-                        startingDirectory = dirs[0].FullName;
-                    }
-                    else if(dirs.Length > 1)
-                    {
-                        ShowError("There seems to be more than directory with the patient's name.  Fix this and try again later");
-                        return;
-                    }
-                    else
-                    {
-                        ShowError("The patient's directory does not exist.  Fix this and try again later.");
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                if(concierge)
-                    ShowError("Cannot find the Concierge directory.");
-                else
-                    ShowError("Cannot find " + Properties.Settings.Default.LastSavedDirectory);
-                return;
-            }
+            bool overwrite = false;
+            string destinationPath = string.Empty;
+            string destinationDirectory = string.Empty;
             DialogResult result;
-            string destinationDirectory;
-            string location = string.Empty;
-            if (concierge)
+            if (!concierge)
             {
-                ConciergeBrowser browser = new ConciergeBrowser(startingDirectory);
-                result = browser.ShowDialog(this);
-                destinationDirectory = browser.SelectedDirectory.FullName;
-                DirectoryInfo[] path;
-                foreach (var p in browser.SelectedPath.Skip(1))
+                try
                 {
-                    string input = p.Name.Trim();
-                    string core = Regex.Replace(input,"#$",s => ( string.Empty ));
-                    location += core + "_";
-                } 
-                path = browser.SelectedPath;
-            }
-            else
-            {
+                    directoryInfoMain = new DirectoryInfo(Properties.Settings.Default.LastSavedDirectory);
+                }
+                catch (SecurityException /*securityException*/)
+                {
+                    ShowError("You do not have permission to access " + Properties.Settings.Default.LastSavedDirectory);
+                    return;
+                }
+                catch (ArgumentException /*argumentException*/)
+                {
+                    ShowError("There is an invalid character in " + Properties.Settings.Default.LastSavedDirectory);
+                    return;
+                }
+                catch (PathTooLongException /*pathTooLongException*/)
+                {
+                    ShowError(Properties.Settings.Default.LastSavedDirectory + " is too far deep");
+                    return;
+                }
+                if (directoryInfoMain.Exists)
+                {
+                    startingDirectory = directoryInfoMain.FullName;
+                }
+                else
+                {
+                    ShowError("Cannot find " + Properties.Settings.Default.LastSavedDirectory);
+                    return;
+                }
+                string location = string.Empty;
                 FolderBrowserDialog dialog = new FolderBrowserDialog();
                 dialog.SelectedPath = startingDirectory;
                 result = Show(dialog);
                 destinationDirectory = dialog.SelectedPath;
+                if (result != DialogResult.OK)
+                    return;
             }
-            if (result == DialogResult.OK)
+            PageRanges pageRanges;
+            if (GetTextBoxPages().Text.Trim() == string.Empty)
+                pageRanges = PageRanges.All;
+            else
             {
-                /*
-                    (GetTextBoxDate(saveType).Text)
-                    + (saveType == SaveType.Procedure ? " " + textBoxProcedureName.Text + " " :  " CONSULT ")
-                    + GetTextBoxLocation(saveType).Text + " " + GetTextBoxDoctor(saveType).Text + " " +
-                    PatientsDirectoryName(saveType).TrimAll() + (concierge ? location : "_nonconcierge" ) + ".PDF";
-                 */
-                PageRanges pageRanges;
-                if (GetTextBoxPages().Text.Trim() == string.Empty)
-                    pageRanges = PageRanges.All;
-                else
-                {
-                    try
-                    {
-                        pageRanges = new PageRanges(GetTextBoxPages().Text);
-                    }
-                    catch (Exception)
-                    {
-                        ShowError("Wasn't able to parse the page range");
-                        return;
-                    }
-                }
-                string destinationPath;
                 try
                 {
+                    pageRanges = new PageRanges(GetTextBoxPages().Text);
+                }
+                catch (Exception)
+                {
+                    ShowError("Wasn't able to parse the page range");
+                    return;
+                }
+            }
+            try
+            {
 
-                    PDF.Document trimmedDocument = document.TrimPages(pageRanges);
-                    if (trimmedDocument == null)
-                    {
-                        ShowError("Couldn't trim and save the new PDF.");
-                        return;
-                    }
+                PDF.Document trimmedDocument = document.TrimPages(pageRanges);
+                if (trimmedDocument == null)
+                {
+                    ShowError("Couldn't trim and save the new PDF.");
+                    return;
+                }
+                if (!concierge)
+                {
+
                     string fileName;
-                    fileName = GenerateFilename((concierge ? "--SVC--" + location : "--SV--")  + TimeStamp());
+                    fileName = GenerateFilename("--SV--" + TimeStamp());
                     destinationPath = destinationDirectory + (destinationDirectory.Last() != '\\' ? @"\" : String.Empty) + fileName;
 
                     if (File.Exists(destinationPath))
@@ -766,16 +709,46 @@ namespace FaxHandler
                     trimmedDocument.Save(destinationPath);
                     trimmedDocument.Dispose();
                 }
-                catch (Exception exception)
+                else
                 {
-                    ShowError("Acrobat reported an error when extracting the pages.\n" + exception.Message);
-                    return;
+                    Db.Db db = Db.Db.Instance();
+                    List<Hashtable> items = new List<Hashtable>();
+                    Hashtable item = new Hashtable();
+                    string[] parts = comboBoxSpecialty.Text.Split(new char[] { '/' });
+                    item["specialty"] = parts[0];
+                    item["subspecialty"] = parts[1] ?? string.Empty;
+                    item["firstName"] = textBoxProcedurePatientsFirstName.Text;
+                    item["lastName"] = textBoxProcedurePatientsLastName.Text;
+                    item["path"] = trimmedDocument.FileName;
+                    item["procedureDate"] = dateTimePickerProcedure.Value;
+                    item["procedureName"] = comboBoxProcedureName.Text;
+                    item["location"] = comboBoxLocation.Text;
+                    item["doctorName"] = comboBoxDoctor.Text;
+                    items.Add(item);
+                    Hashtable dbResult = db.AddActivities(items);
+                    if (checkBoxView.Checked)
+                    {
+                        if (dbResult["status"] as string == "ok")
+                        {
+                            List<Hashtable> data = dbResult["data"] as List<Hashtable>;
+                            int file_id = (int)data[0]["file_id"];
+                            Process.Start("http://localhost:50505/downloadfile/" + file_id + ".pdf");
+                        }
+                    }
                 }
-                if (checkBoxView.Checked)
+            }
+            catch (Exception exception)
+            {
+                ShowError("Acrobat reported an error when extracting the pages.\n" + exception.Message);
+                return;
+            }
+            if (checkBoxView.Checked)
+            {
+                if (!concierge)
                 {
                     int tries = 5;
                     int sleepTime = 1 * 1000; // one second
-                    for (int i = 0; i < tries;i++ )
+                    for (int i = 0; i < tries; i++)
                     {
                         System.Threading.Thread.Sleep(sleepTime); // gives Acrobat a chance to finish
                         FileInfo fileInfo = new FileInfo(destinationPath);
@@ -798,18 +771,11 @@ namespace FaxHandler
                             }
                         }
                     }
-                    if(concierge)
-                        Process.Start("explorer.exe", "/select,\"" + startingDirectory + "\"");
-                    else
-                        Process.Start("explorer.exe", "/select,\"" + destinationPath + "\"");
+                    Process.Start("explorer.exe", "/select,\"" + destinationPath + "\"");
                     System.Threading.Thread.Sleep(1000);
                 }
-                AddPredefinedProcedure(comboBoxProcedureName.Text);
-                if (concierge)
-                {
-                    UpdateDirectoryLabels(destinationPath);
-                }
             }
+            //AddPredefinedProcedure(comboBoxProcedureName.Text);
         }
         #region Boxes
         DialogResult ShowSetup()
@@ -969,7 +935,7 @@ namespace FaxHandler
 
         class Minispecialty
         {
-            Hashtable values;
+            public Hashtable values;
             public Minispecialty(Hashtable values)
             {
                 this.values = values;
@@ -990,15 +956,51 @@ namespace FaxHandler
                 return; // reentrancy issue
             SetStatus();
             Db.Db db = Db.Db.Instance();
-            Hashtable result = db.GetSpecialties();
-            if (result["status"] as string == "ok")
+            Hashtable result;
+            if (comboBoxPatients.SelectedIndex < 0)
             {
-                List<Hashtable> items = result["data"] as List<Hashtable>;
-                foreach (var item in items)
+                result = db.GetSpecialties();
+                if (result["status"] as string == "ok")
                 {
-                    comboBoxSpecialty.Items.Add(new Minispecialty(item));
+                    AutoCompleteStringCollection acc = new AutoCompleteStringCollection();
+                    List<Hashtable> items = result["data"] as List<Hashtable>;
+                    foreach (Hashtable item in items)
+                    {
+                        Minispecialty m = new Minispecialty(item);
+                        comboBoxSpecialty.Items.Add(m);
+                        acc.Add(m.ToString());
+                    }
+                    comboBoxSpecialty.AutoCompleteCustomSource = acc;
                 }
             }
+            else
+            {
+                Minipatient p = comboBoxPatients.Items[comboBoxPatients.SelectedIndex] as Minipatient;
+                int patient_id = (int)p.values["id"];
+                result = db.GetPatientSpecialties(patient_id);
+                if (result["status"] as string == "ok")
+                {
+                    List<Hashtable> items = result["data"] as List<Hashtable>;
+                    AutoCompleteStringCollection acc = new AutoCompleteStringCollection();
+                    foreach (Hashtable item in items)
+                    {
+                        if ((int)item["count"] > 0)
+                            comboBoxSpecialty.Items.Add(new Minispecialty(item));
+                    }
+                    foreach (Hashtable item in items)
+                    {
+                        string specialty = item["specialty"] as string;
+                        string subspecialty = (item["subspecialty"] ?? string.Empty) as string;
+                        string formatted = subspecialty == string.Empty ? specialty : string.Format("{0}/{1}", specialty, subspecialty);
+                        acc.Add(formatted);
+                        if ((int)item["count"] == 0)
+                            comboBoxSpecialty.Items.Add(new Minispecialty(item));
+                    }
+                    comboBoxSpecialty.AutoCompleteCustomSource = acc;
+                }
+            }
+            if (result["status"] as string == "error")
+                SetStatus(result["reason"] as string);
         }
 
         private void comboBoxPatients_Enter(object sender, EventArgs e)
@@ -1049,6 +1051,7 @@ namespace FaxHandler
                 SetStatus("Adding the suffix would make the doctor name too long");
                 return;
             }
+            SetStatus(comboBoxDoctor.Text);
             comboBoxDoctor.Text += "," + val;
         }
 
@@ -1146,6 +1149,130 @@ namespace FaxHandler
         private void buttonClear_Click(object sender, EventArgs e)
         {
             SetStatus();
+        }
+
+        private void comboBoxSpecialty_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            Minispecialty m = comboBoxSpecialty.Items[e.Index] as Minispecialty;
+            int id = (int)m.values["id"];
+            int count = (int)(m.values["count"] ?? 0);
+            e.DrawBackground();
+            bool fSelected = (DrawItemState.Selected & e.State) > 0;
+            if (count > 0)
+            {
+                ControlPaint.DrawButton(e.Graphics, e.Bounds, fSelected ? ButtonState.Pushed : ButtonState.Normal);
+                e.Graphics.DrawString(m.ToString(), e.Font, new SolidBrush(SystemColors.ControlText), e.Bounds.Location);
+            }
+            else
+                e.Graphics.DrawString(m.ToString(), e.Font, new SolidBrush(e.ForeColor), e.Bounds.Location);
+            if(fSelected)
+                Console.Error.WriteLine(e.ForeColor.ToString());
+        }
+
+        private void comboBoxDoctor_TextUpdate(object sender, EventArgs e)
+        {
+        }
+        void UpdateAddPatientButton()
+        {
+            string first = textBoxProcedurePatientsFirstName.Text.Trim();
+            string last = textBoxProcedurePatientsLastName.Text.Trim();
+            if (first == string.Empty || last == string.Empty)
+            {
+                buttonAddPatient.Enabled = false;
+                return;
+            }
+            string val = string.Format("{0},{1}",last,first);
+            foreach (var item in comboBoxPatients.Items)
+            {
+                Minipatient mp = item as Minipatient;
+                if (mp.ToString() == val)
+                {
+                    buttonAddPatient.Enabled = false;
+                    return;
+                }
+            }
+            buttonAddPatient.Enabled = true;
+        }
+        void UpdateAddDoctorButton()
+        {
+            if (comboBoxDoctor.Text.Trim() == string.Empty)
+            {
+                buttonAddNewDoctor.Enabled = false;
+                return;
+            }
+            foreach (Minidoctor md in comboBoxDoctor.Items)
+            {
+                if (comboBoxDoctor.Text == md.ToString())
+                {
+                    buttonAddNewDoctor.Enabled = false;
+                    return;
+                }
+            }
+            buttonAddNewDoctor.Enabled = true;
+  //          comboBoxDoctor.SelectedIndex = -1;
+        }
+
+        private void comboBoxDoctor_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            buttonAddNewDoctor.Enabled = comboBoxDoctor.SelectedIndex < 0;
+        }
+
+        private void comboBoxDoctor_TextChanged(object sender, EventArgs e)
+        {
+            //comboBoxDoctor_TextUpdate(sender, e);
+        }
+
+        private void buttonAddNewDoctor_Click(object sender, EventArgs e)
+        {
+            AddDoctor addDoctorForm = new AddDoctor(comboBoxDoctor.Text.Trim());
+            DialogResult r = addDoctorForm.ShowDialog(this);
+            if (r == System.Windows.Forms.DialogResult.Cancel)
+                return;
+            Db.Db db = Db.Db.Instance();
+            Hashtable parms = new Hashtable();
+            parms["firstName"] = addDoctorForm.DoctorProperties.FirstName;
+            parms["lastName"] = addDoctorForm.DoctorProperties.LastName;
+            parms["shortName"] = comboBoxDoctor.Text.Trim();
+            parms["address1"] = addDoctorForm.DoctorProperties.Address1;
+            parms["address2"] = addDoctorForm.DoctorProperties.Address2;
+            parms["address3"] = addDoctorForm.DoctorProperties.Address3;
+            parms["city"] = addDoctorForm.DoctorProperties.City;
+            parms["locality1"] = addDoctorForm.DoctorProperties.Locality1;
+            parms["locality2"] = addDoctorForm.DoctorProperties.Locality2;
+            parms["postalCode"] = addDoctorForm.DoctorProperties.PostalCode;
+            parms["country"] = addDoctorForm.DoctorProperties.Country;
+            parms["voice"] = addDoctorForm.DoctorProperties.Telephone;
+            parms["fax"] = addDoctorForm.DoctorProperties.Fax;
+            parms["email"] = addDoctorForm.DoctorProperties.Email;
+            parms["contact"] = addDoctorForm.DoctorProperties.ContactPerson;
+            Hashtable result;
+            result = db.AddDoctor(parms);
+            if (result["status"] as string == "ok")
+                return;
+            SetStatus("An error happened while trying to add a doctor.  More information:" + result["reason"] as string);
+        }
+
+        private void buttonAddPatient_Click(object sender, EventArgs e)
+        {
+            string first = textBoxProcedurePatientsFirstName.Text.Trim();
+            string last = textBoxProcedurePatientsLastName.Text.Trim();
+            string name = string.Format("{0} {1}", first, last);
+            AddPatient AddPatientForm = new AddPatient(name);
+            DialogResult r = AddPatientForm.ShowDialog(this);
+            if (r == DialogResult.Cancel)
+                return;
+            Hashtable result;
+            Hashtable parms = new Hashtable();
+            Db.Db db = Db.Db.Instance();
+            parms["firstName"] = first;
+            parms["lastName"] = last;
+            parms["dateOfBirth"] = AddPatientForm.PatientProperties.DateOfBirth.ToString();
+            parms["gender"] = AddPatientForm.PatientProperties.Gender;
+            parms["emergencyContact"] = AddPatientForm.PatientProperties.EmergencyContact;
+            result = db.AddPatient(parms);
+            if (result["status"] as string == "ok")
+                return;
+            SetStatus("An error occurred while trying to add a patient.  More info:" + result["reason"]);
         }
 
     }

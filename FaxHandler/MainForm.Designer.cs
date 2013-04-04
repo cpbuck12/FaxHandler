@@ -47,49 +47,62 @@
             this.comboBoxLocation = new System.Windows.Forms.ComboBox();
             this.comboBoxDoctor = new System.Windows.Forms.ComboBox();
             this.groupBoxProcedure = new System.Windows.Forms.GroupBox();
+            this.comboBoxSpecialty = new System.Windows.Forms.ComboBox();
+            this.labelSpecialty = new System.Windows.Forms.Label();
             this.labelProcedureName = new System.Windows.Forms.Label();
             this.groupBoxPatient = new System.Windows.Forms.GroupBox();
+            this.buttonAddPatient = new System.Windows.Forms.Button();
             this.comboBoxPatients = new System.Windows.Forms.ComboBox();
+            this.buttonGetSignature = new System.Windows.Forms.Button();
             this.groupBoxPractitioner = new System.Windows.Forms.GroupBox();
+            this.buttonAddNewDoctor = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.labelPractitionerName = new System.Windows.Forms.Label();
-            this.buttonGetSignature = new System.Windows.Forms.Button();
-            this.buttonCreateRelease = new System.Windows.Forms.Button();
+            this.buttonAcceptReleaseResponse = new System.Windows.Forms.Button();
             this.textBoxStatus = new System.Windows.Forms.TextBox();
             this.buttonClear = new System.Windows.Forms.Button();
-            this.labelSpecialty = new System.Windows.Forms.Label();
-            this.comboBoxSpecialty = new System.Windows.Forms.ComboBox();
+            this.groupBoxReleaseResponse = new System.Windows.Forms.GroupBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.labelReceived = new System.Windows.Forms.Label();
+            this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
+            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.dragger1 = new FaxHandler.Dragger();
             this.groupBoxProcedure.SuspendLayout();
             this.groupBoxPatient.SuspendLayout();
             this.groupBoxPractitioner.SuspendLayout();
+            this.groupBoxReleaseResponse.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonSaveConciergeProcedure
             // 
             this.buttonSaveConciergeProcedure.Enabled = false;
-            this.buttonSaveConciergeProcedure.Location = new System.Drawing.Point(15, 351);
+            this.buttonSaveConciergeProcedure.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonSaveConciergeProcedure.Location = new System.Drawing.Point(196, 118);
             this.buttonSaveConciergeProcedure.Name = "buttonSaveConciergeProcedure";
-            this.buttonSaveConciergeProcedure.Size = new System.Drawing.Size(161, 23);
+            this.buttonSaveConciergeProcedure.Size = new System.Drawing.Size(94, 23);
             this.buttonSaveConciergeProcedure.TabIndex = 303;
-            this.buttonSaveConciergeProcedure.Text = "Save Concierge Procedure...";
+            this.buttonSaveConciergeProcedure.Text = "Save Concierge";
             this.buttonSaveConciergeProcedure.UseVisualStyleBackColor = true;
             this.buttonSaveConciergeProcedure.Click += new System.EventHandler(this.buttonSaveConciergeProcedure_Click);
             // 
             // buttonSaveProcedure
             // 
-            this.buttonSaveProcedure.Location = new System.Drawing.Point(182, 351);
+            this.buttonSaveProcedure.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonSaveProcedure.Location = new System.Drawing.Point(296, 118);
             this.buttonSaveProcedure.Name = "buttonSaveProcedure";
-            this.buttonSaveProcedure.Size = new System.Drawing.Size(127, 23);
+            this.buttonSaveProcedure.Size = new System.Drawing.Size(89, 23);
             this.buttonSaveProcedure.TabIndex = 304;
-            this.buttonSaveProcedure.Text = "Save Procedure...";
+            this.buttonSaveProcedure.Text = "Save...";
             this.buttonSaveProcedure.UseVisualStyleBackColor = true;
             this.buttonSaveProcedure.Click += new System.EventHandler(this.buttonSaveProcedure_Click);
             // 
             // checkBoxView
             // 
             this.checkBoxView.AutoSize = true;
-            this.checkBoxView.Location = new System.Drawing.Point(315, 357);
+            this.checkBoxView.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.checkBoxView.Location = new System.Drawing.Point(391, 122);
             this.checkBoxView.Name = "checkBoxView";
             this.checkBoxView.Size = new System.Drawing.Size(49, 17);
             this.checkBoxView.TabIndex = 306;
@@ -100,6 +113,7 @@
             // labelProcedureDate
             // 
             this.labelProcedureDate.AutoSize = true;
+            this.labelProcedureDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelProcedureDate.Location = new System.Drawing.Point(6, 16);
             this.labelProcedureDate.Name = "labelProcedureDate";
             this.labelProcedureDate.Size = new System.Drawing.Size(30, 13);
@@ -109,6 +123,7 @@
             // labelProcedureLocation
             // 
             this.labelProcedureLocation.AutoSize = true;
+            this.labelProcedureLocation.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelProcedureLocation.Location = new System.Drawing.Point(6, 42);
             this.labelProcedureLocation.Name = "labelProcedureLocation";
             this.labelProcedureLocation.Size = new System.Drawing.Size(48, 13);
@@ -118,6 +133,7 @@
             // labelProcedurePatientFirstName
             // 
             this.labelProcedurePatientFirstName.AutoSize = true;
+            this.labelProcedurePatientFirstName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelProcedurePatientFirstName.Location = new System.Drawing.Point(6, 19);
             this.labelProcedurePatientFirstName.Name = "labelProcedurePatientFirstName";
             this.labelProcedurePatientFirstName.Size = new System.Drawing.Size(26, 13);
@@ -128,6 +144,7 @@
             // labelProcedurePatientLastName
             // 
             this.labelProcedurePatientLastName.AutoSize = true;
+            this.labelProcedurePatientLastName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelProcedurePatientLastName.Location = new System.Drawing.Point(6, 41);
             this.labelProcedurePatientLastName.Name = "labelProcedurePatientLastName";
             this.labelProcedurePatientLastName.Size = new System.Drawing.Size(27, 13);
@@ -140,23 +157,24 @@
             this.textBoxProcedureDate.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxProcedureDate.Location = new System.Drawing.Point(71, 13);
             this.textBoxProcedureDate.Name = "textBoxProcedureDate";
-            this.textBoxProcedureDate.Size = new System.Drawing.Size(174, 22);
+            this.textBoxProcedureDate.Size = new System.Drawing.Size(119, 22);
             this.textBoxProcedureDate.TabIndex = 5;
             // 
             // dateTimePickerProcedure
             // 
             this.dateTimePickerProcedure.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.dateTimePickerProcedure.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.dateTimePickerProcedure.Location = new System.Drawing.Point(300, 11);
+            this.dateTimePickerProcedure.Location = new System.Drawing.Point(196, 13);
             this.dateTimePickerProcedure.Name = "dateTimePickerProcedure";
-            this.dateTimePickerProcedure.Size = new System.Drawing.Size(140, 22);
+            this.dateTimePickerProcedure.Size = new System.Drawing.Size(118, 22);
             this.dateTimePickerProcedure.TabIndex = 100;
             this.dateTimePickerProcedure.ValueChanged += new System.EventHandler(this.dateTimePickerProcedure_ValueChanged);
             // 
             // labelProcedurePages
             // 
             this.labelProcedurePages.AutoSize = true;
-            this.labelProcedurePages.Location = new System.Drawing.Point(6, 96);
+            this.labelProcedurePages.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelProcedurePages.Location = new System.Drawing.Point(7, 123);
             this.labelProcedurePages.Name = "labelProcedurePages";
             this.labelProcedurePages.Size = new System.Drawing.Size(43, 13);
             this.labelProcedurePages.TabIndex = 2;
@@ -166,9 +184,9 @@
             // 
             this.textBoxProcedurePages.Enabled = false;
             this.textBoxProcedurePages.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxProcedurePages.Location = new System.Drawing.Point(71, 93);
+            this.textBoxProcedurePages.Location = new System.Drawing.Point(71, 119);
             this.textBoxProcedurePages.Name = "textBoxProcedurePages";
-            this.textBoxProcedurePages.Size = new System.Drawing.Size(369, 22);
+            this.textBoxProcedurePages.Size = new System.Drawing.Size(119, 22);
             this.textBoxProcedurePages.TabIndex = 106;
             // 
             // textBoxProcedurePatientsFirstName
@@ -177,7 +195,7 @@
             this.textBoxProcedurePatientsFirstName.Location = new System.Drawing.Point(70, 12);
             this.textBoxProcedurePatientsFirstName.MaxLength = 50;
             this.textBoxProcedurePatientsFirstName.Name = "textBoxProcedurePatientsFirstName";
-            this.textBoxProcedurePatientsFirstName.Size = new System.Drawing.Size(370, 22);
+            this.textBoxProcedurePatientsFirstName.Size = new System.Drawing.Size(266, 22);
             this.textBoxProcedurePatientsFirstName.TabIndex = 103;
             this.textBoxProcedurePatientsFirstName.TextChanged += new System.EventHandler(this.textBoxProcedurePatientsFirstName_TextChanged);
             this.textBoxProcedurePatientsFirstName.Validating += new System.ComponentModel.CancelEventHandler(this.textBox_Validating);
@@ -188,7 +206,7 @@
             this.textBoxProcedurePatientsLastName.Location = new System.Drawing.Point(71, 38);
             this.textBoxProcedurePatientsLastName.MaxLength = 50;
             this.textBoxProcedurePatientsLastName.Name = "textBoxProcedurePatientsLastName";
-            this.textBoxProcedurePatientsLastName.Size = new System.Drawing.Size(369, 22);
+            this.textBoxProcedurePatientsLastName.Size = new System.Drawing.Size(265, 22);
             this.textBoxProcedurePatientsLastName.TabIndex = 104;
             this.textBoxProcedurePatientsLastName.TextChanged += new System.EventHandler(this.textBoxProcedurePatientsLastName_TextChanged);
             this.textBoxProcedurePatientsLastName.Validating += new System.ComponentModel.CancelEventHandler(this.textBox_Validating);
@@ -198,13 +216,14 @@
             this.comboBoxSuffix.DropDownHeight = 400;
             this.comboBoxSuffix.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBoxSuffix.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.comboBoxSuffix.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxSuffix.FormattingEnabled = true;
             this.comboBoxSuffix.IntegralHeight = false;
-            this.comboBoxSuffix.ItemHeight = 13;
-            this.comboBoxSuffix.Location = new System.Drawing.Point(71, 44);
+            this.comboBoxSuffix.ItemHeight = 16;
+            this.comboBoxSuffix.Location = new System.Drawing.Point(71, 38);
             this.comboBoxSuffix.MaxLength = 12;
             this.comboBoxSuffix.Name = "comboBoxSuffix";
-            this.comboBoxSuffix.Size = new System.Drawing.Size(172, 21);
+            this.comboBoxSuffix.Size = new System.Drawing.Size(180, 24);
             this.comboBoxSuffix.TabIndex = 107;
             this.comboBoxSuffix.SelectedIndexChanged += new System.EventHandler(this.comboBoxSuffix_SelectedIndexChanged);
             this.comboBoxSuffix.Enter += new System.EventHandler(this.comboBoxSuffix_Enter);
@@ -259,6 +278,9 @@
             this.comboBoxDoctor.Size = new System.Drawing.Size(369, 24);
             this.comboBoxDoctor.Sorted = true;
             this.comboBoxDoctor.TabIndex = 110;
+            this.comboBoxDoctor.SelectedIndexChanged += new System.EventHandler(this.comboBoxDoctor_SelectedIndexChanged);
+            this.comboBoxDoctor.TextUpdate += new System.EventHandler(this.comboBoxDoctor_TextUpdate);
+            this.comboBoxDoctor.TextChanged += new System.EventHandler(this.comboBoxDoctor_TextChanged);
             this.comboBoxDoctor.Enter += new System.EventHandler(this.comboBoxDoctor_Enter);
             // 
             // groupBoxProcedure
@@ -270,10 +292,15 @@
             this.groupBoxProcedure.Controls.Add(this.dateTimePickerProcedure);
             this.groupBoxProcedure.Controls.Add(this.labelProcedureDate);
             this.groupBoxProcedure.Controls.Add(this.textBoxProcedurePages);
+            this.groupBoxProcedure.Controls.Add(this.dragger1);
             this.groupBoxProcedure.Controls.Add(this.labelProcedureLocation);
             this.groupBoxProcedure.Controls.Add(this.comboBoxLocation);
+            this.groupBoxProcedure.Controls.Add(this.checkBoxView);
             this.groupBoxProcedure.Controls.Add(this.comboBoxProcedureName);
+            this.groupBoxProcedure.Controls.Add(this.buttonSaveProcedure);
             this.groupBoxProcedure.Controls.Add(this.labelProcedurePages);
+            this.groupBoxProcedure.Controls.Add(this.buttonSaveConciergeProcedure);
+            this.groupBoxProcedure.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBoxProcedure.Location = new System.Drawing.Point(15, 12);
             this.groupBoxProcedure.Name = "groupBoxProcedure";
             this.groupBoxProcedure.Size = new System.Drawing.Size(446, 151);
@@ -281,9 +308,38 @@
             this.groupBoxProcedure.TabStop = false;
             this.groupBoxProcedure.Text = "Procedure";
             // 
+            // comboBoxSpecialty
+            // 
+            this.comboBoxSpecialty.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this.comboBoxSpecialty.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this.comboBoxSpecialty.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+            this.comboBoxSpecialty.DropDownHeight = 400;
+            this.comboBoxSpecialty.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxSpecialty.FormattingEnabled = true;
+            this.comboBoxSpecialty.IntegralHeight = false;
+            this.comboBoxSpecialty.ItemHeight = 16;
+            this.comboBoxSpecialty.Location = new System.Drawing.Point(71, 93);
+            this.comboBoxSpecialty.MaxLength = 100;
+            this.comboBoxSpecialty.Name = "comboBoxSpecialty";
+            this.comboBoxSpecialty.Size = new System.Drawing.Size(370, 22);
+            this.comboBoxSpecialty.TabIndex = 315;
+            this.comboBoxSpecialty.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.comboBoxSpecialty_DrawItem);
+            this.comboBoxSpecialty.Enter += new System.EventHandler(this.comboBoxSpecialty_Enter);
+            // 
+            // labelSpecialty
+            // 
+            this.labelSpecialty.AutoSize = true;
+            this.labelSpecialty.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelSpecialty.Location = new System.Drawing.Point(6, 97);
+            this.labelSpecialty.Name = "labelSpecialty";
+            this.labelSpecialty.Size = new System.Drawing.Size(50, 13);
+            this.labelSpecialty.TabIndex = 314;
+            this.labelSpecialty.Text = "Specialty";
+            // 
             // labelProcedureName
             // 
             this.labelProcedureName.AutoSize = true;
+            this.labelProcedureName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelProcedureName.Location = new System.Drawing.Point(6, 69);
             this.labelProcedureName.Name = "labelProcedureName";
             this.labelProcedureName.Size = new System.Drawing.Size(35, 13);
@@ -292,17 +348,31 @@
             // 
             // groupBoxPatient
             // 
+            this.groupBoxPatient.Controls.Add(this.buttonAddPatient);
             this.groupBoxPatient.Controls.Add(this.comboBoxPatients);
             this.groupBoxPatient.Controls.Add(this.labelProcedurePatientFirstName);
             this.groupBoxPatient.Controls.Add(this.labelProcedurePatientLastName);
+            this.groupBoxPatient.Controls.Add(this.buttonGetSignature);
             this.groupBoxPatient.Controls.Add(this.textBoxProcedurePatientsFirstName);
             this.groupBoxPatient.Controls.Add(this.textBoxProcedurePatientsLastName);
+            this.groupBoxPatient.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBoxPatient.Location = new System.Drawing.Point(15, 247);
             this.groupBoxPatient.Name = "groupBoxPatient";
             this.groupBoxPatient.Size = new System.Drawing.Size(446, 98);
             this.groupBoxPatient.TabIndex = 312;
             this.groupBoxPatient.TabStop = false;
             this.groupBoxPatient.Text = "Patient";
+            // 
+            // buttonAddPatient
+            // 
+            this.buttonAddPatient.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonAddPatient.Location = new System.Drawing.Point(342, 12);
+            this.buttonAddPatient.Name = "buttonAddPatient";
+            this.buttonAddPatient.Size = new System.Drawing.Size(98, 23);
+            this.buttonAddPatient.TabIndex = 315;
+            this.buttonAddPatient.Text = "Add...";
+            this.buttonAddPatient.UseVisualStyleBackColor = true;
+            this.buttonAddPatient.Click += new System.EventHandler(this.buttonAddPatient_Click);
             // 
             // comboBoxPatients
             // 
@@ -323,12 +393,25 @@
             this.comboBoxPatients.SelectedIndexChanged += new System.EventHandler(this.comboBoxPatients_SelectedIndexChanged);
             this.comboBoxPatients.Enter += new System.EventHandler(this.comboBoxPatients_Enter);
             // 
+            // buttonGetSignature
+            // 
+            this.buttonGetSignature.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonGetSignature.Location = new System.Drawing.Point(342, 38);
+            this.buttonGetSignature.Name = "buttonGetSignature";
+            this.buttonGetSignature.Size = new System.Drawing.Size(98, 23);
+            this.buttonGetSignature.TabIndex = 314;
+            this.buttonGetSignature.Text = "Get Signature...";
+            this.buttonGetSignature.UseVisualStyleBackColor = true;
+            this.buttonGetSignature.Click += new System.EventHandler(this.buttonGetSignature_Click);
+            // 
             // groupBoxPractitioner
             // 
+            this.groupBoxPractitioner.Controls.Add(this.buttonAddNewDoctor);
             this.groupBoxPractitioner.Controls.Add(this.label1);
             this.groupBoxPractitioner.Controls.Add(this.labelPractitionerName);
             this.groupBoxPractitioner.Controls.Add(this.comboBoxDoctor);
             this.groupBoxPractitioner.Controls.Add(this.comboBoxSuffix);
+            this.groupBoxPractitioner.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBoxPractitioner.Location = new System.Drawing.Point(15, 169);
             this.groupBoxPractitioner.Name = "groupBoxPractitioner";
             this.groupBoxPractitioner.Size = new System.Drawing.Size(446, 72);
@@ -336,9 +419,21 @@
             this.groupBoxPractitioner.TabStop = false;
             this.groupBoxPractitioner.Text = "Practitioner";
             // 
+            // buttonAddNewDoctor
+            // 
+            this.buttonAddNewDoctor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonAddNewDoctor.Location = new System.Drawing.Point(296, 38);
+            this.buttonAddNewDoctor.Name = "buttonAddNewDoctor";
+            this.buttonAddNewDoctor.Size = new System.Drawing.Size(144, 23);
+            this.buttonAddNewDoctor.TabIndex = 319;
+            this.buttonAddNewDoctor.Text = "Add New Practitioner...";
+            this.buttonAddNewDoctor.UseVisualStyleBackColor = true;
+            this.buttonAddNewDoctor.Click += new System.EventHandler(this.buttonAddNewDoctor_Click);
+            // 
             // label1
             // 
             this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(6, 47);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(44, 13);
@@ -348,77 +443,118 @@
             // labelPractitionerName
             // 
             this.labelPractitionerName.AutoSize = true;
+            this.labelPractitionerName.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelPractitionerName.Location = new System.Drawing.Point(6, 15);
             this.labelPractitionerName.Name = "labelPractitionerName";
             this.labelPractitionerName.Size = new System.Drawing.Size(35, 13);
             this.labelPractitionerName.TabIndex = 0;
             this.labelPractitionerName.Text = "Name";
             // 
-            // buttonGetSignature
+            // buttonAcceptReleaseResponse
             // 
-            this.buttonGetSignature.Location = new System.Drawing.Point(15, 380);
-            this.buttonGetSignature.Name = "buttonGetSignature";
-            this.buttonGetSignature.Size = new System.Drawing.Size(127, 23);
-            this.buttonGetSignature.TabIndex = 314;
-            this.buttonGetSignature.Text = "Get Signature...";
-            this.buttonGetSignature.UseVisualStyleBackColor = true;
-            this.buttonGetSignature.Click += new System.EventHandler(this.buttonGetSignature_Click);
-            // 
-            // buttonCreateRelease
-            // 
-            this.buttonCreateRelease.Location = new System.Drawing.Point(161, 380);
-            this.buttonCreateRelease.Name = "buttonCreateRelease";
-            this.buttonCreateRelease.Size = new System.Drawing.Size(116, 23);
-            this.buttonCreateRelease.TabIndex = 315;
-            this.buttonCreateRelease.Text = "Create Release...";
-            this.buttonCreateRelease.UseVisualStyleBackColor = true;
+            this.buttonAcceptReleaseResponse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonAcceptReleaseResponse.Location = new System.Drawing.Point(320, 19);
+            this.buttonAcceptReleaseResponse.Name = "buttonAcceptReleaseResponse";
+            this.buttonAcceptReleaseResponse.Size = new System.Drawing.Size(120, 49);
+            this.buttonAcceptReleaseResponse.TabIndex = 315;
+            this.buttonAcceptReleaseResponse.Text = "Save...";
+            this.buttonAcceptReleaseResponse.UseVisualStyleBackColor = true;
             // 
             // textBoxStatus
             // 
             this.textBoxStatus.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxStatus.Location = new System.Drawing.Point(15, 408);
+            this.textBoxStatus.Location = new System.Drawing.Point(15, 433);
             this.textBoxStatus.Multiline = true;
             this.textBoxStatus.Name = "textBoxStatus";
             this.textBoxStatus.ReadOnly = true;
-            this.textBoxStatus.Size = new System.Drawing.Size(446, 93);
+            this.textBoxStatus.Size = new System.Drawing.Size(399, 93);
             this.textBoxStatus.TabIndex = 316;
             this.textBoxStatus.TabStop = false;
             // 
             // buttonClear
             // 
-            this.buttonClear.Location = new System.Drawing.Point(467, 410);
+            this.buttonClear.Location = new System.Drawing.Point(420, 435);
             this.buttonClear.Name = "buttonClear";
-            this.buttonClear.Size = new System.Drawing.Size(54, 91);
+            this.buttonClear.Size = new System.Drawing.Size(41, 91);
             this.buttonClear.TabIndex = 317;
             this.buttonClear.Text = "Clear";
             this.buttonClear.UseVisualStyleBackColor = true;
             this.buttonClear.Click += new System.EventHandler(this.buttonClear_Click);
             // 
-            // labelSpecialty
+            // groupBoxReleaseResponse
             // 
-            this.labelSpecialty.AutoSize = true;
-            this.labelSpecialty.Location = new System.Drawing.Point(6, 124);
-            this.labelSpecialty.Name = "labelSpecialty";
-            this.labelSpecialty.Size = new System.Drawing.Size(50, 13);
-            this.labelSpecialty.TabIndex = 314;
-            this.labelSpecialty.Text = "Specialty";
+            this.groupBoxReleaseResponse.Controls.Add(this.label2);
+            this.groupBoxReleaseResponse.Controls.Add(this.textBox2);
+            this.groupBoxReleaseResponse.Controls.Add(this.labelReceived);
+            this.groupBoxReleaseResponse.Controls.Add(this.buttonAcceptReleaseResponse);
+            this.groupBoxReleaseResponse.Controls.Add(this.dateTimePicker2);
+            this.groupBoxReleaseResponse.Controls.Add(this.textBox1);
+            this.groupBoxReleaseResponse.Controls.Add(this.dateTimePicker1);
+            this.groupBoxReleaseResponse.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBoxReleaseResponse.Location = new System.Drawing.Point(15, 351);
+            this.groupBoxReleaseResponse.Name = "groupBoxReleaseResponse";
+            this.groupBoxReleaseResponse.Size = new System.Drawing.Size(446, 76);
+            this.groupBoxReleaseResponse.TabIndex = 318;
+            this.groupBoxReleaseResponse.TabStop = false;
+            this.groupBoxReleaseResponse.Text = "Release Response";
             // 
-            // comboBoxSpecialty
+            // label2
             // 
-            this.comboBoxSpecialty.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
-            this.comboBoxSpecialty.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.comboBoxSpecialty.DropDownHeight = 400;
-            this.comboBoxSpecialty.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.comboBoxSpecialty.FormattingEnabled = true;
-            this.comboBoxSpecialty.IntegralHeight = false;
-            this.comboBoxSpecialty.ItemHeight = 16;
-            this.comboBoxSpecialty.Location = new System.Drawing.Point(70, 119);
-            this.comboBoxSpecialty.MaxLength = 100;
-            this.comboBoxSpecialty.Name = "comboBoxSpecialty";
-            this.comboBoxSpecialty.Size = new System.Drawing.Size(370, 24);
-            this.comboBoxSpecialty.Sorted = true;
-            this.comboBoxSpecialty.TabIndex = 315;
-            this.comboBoxSpecialty.Enter += new System.EventHandler(this.comboBoxSpecialty_Enter);
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(7, 54);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(50, 13);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Scanned";
+            // 
+            // textBox2
+            // 
+            this.textBox2.Enabled = false;
+            this.textBox2.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox2.Location = new System.Drawing.Point(71, 46);
+            this.textBox2.Name = "textBox2";
+            this.textBox2.Size = new System.Drawing.Size(119, 22);
+            this.textBox2.TabIndex = 5;
+            // 
+            // labelReceived
+            // 
+            this.labelReceived.AutoSize = true;
+            this.labelReceived.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelReceived.Location = new System.Drawing.Point(6, 26);
+            this.labelReceived.Name = "labelReceived";
+            this.labelReceived.Size = new System.Drawing.Size(53, 13);
+            this.labelReceived.TabIndex = 0;
+            this.labelReceived.Text = "Received";
+            // 
+            // dateTimePicker2
+            // 
+            this.dateTimePicker2.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dateTimePicker2.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dateTimePicker2.Location = new System.Drawing.Point(196, 46);
+            this.dateTimePicker2.Name = "dateTimePicker2";
+            this.dateTimePicker2.Size = new System.Drawing.Size(118, 22);
+            this.dateTimePicker2.TabIndex = 100;
+            this.dateTimePicker2.ValueChanged += new System.EventHandler(this.dateTimePickerProcedure_ValueChanged);
+            // 
+            // textBox1
+            // 
+            this.textBox1.Enabled = false;
+            this.textBox1.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBox1.Location = new System.Drawing.Point(71, 22);
+            this.textBox1.Name = "textBox1";
+            this.textBox1.Size = new System.Drawing.Size(119, 22);
+            this.textBox1.TabIndex = 5;
+            // 
+            // dateTimePicker1
+            // 
+            this.dateTimePicker1.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.dateTimePicker1.Location = new System.Drawing.Point(196, 22);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.Size = new System.Drawing.Size(118, 22);
+            this.dateTimePicker1.TabIndex = 100;
+            this.dateTimePicker1.ValueChanged += new System.EventHandler(this.dateTimePickerProcedure_ValueChanged);
             // 
             // dragger1
             // 
@@ -426,27 +562,22 @@
             this.dragger1.Dragging = false;
             this.dragger1.ForeColor = System.Drawing.SystemColors.ControlDark;
             this.dragger1.Full = false;
-            this.dragger1.Location = new System.Drawing.Point(467, 25);
+            this.dragger1.Location = new System.Drawing.Point(320, 13);
             this.dragger1.Name = "dragger1";
-            this.dragger1.Size = new System.Drawing.Size(54, 309);
+            this.dragger1.Size = new System.Drawing.Size(120, 22);
             this.dragger1.TabIndex = 308;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(533, 513);
+            this.ClientSize = new System.Drawing.Size(470, 534);
+            this.Controls.Add(this.groupBoxReleaseResponse);
             this.Controls.Add(this.buttonClear);
             this.Controls.Add(this.textBoxStatus);
-            this.Controls.Add(this.buttonCreateRelease);
-            this.Controls.Add(this.buttonGetSignature);
             this.Controls.Add(this.groupBoxPractitioner);
             this.Controls.Add(this.groupBoxPatient);
             this.Controls.Add(this.groupBoxProcedure);
-            this.Controls.Add(this.dragger1);
-            this.Controls.Add(this.checkBoxView);
-            this.Controls.Add(this.buttonSaveProcedure);
-            this.Controls.Add(this.buttonSaveConciergeProcedure);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -463,6 +594,8 @@
             this.groupBoxPatient.PerformLayout();
             this.groupBoxPractitioner.ResumeLayout(false);
             this.groupBoxPractitioner.PerformLayout();
+            this.groupBoxReleaseResponse.ResumeLayout(false);
+            this.groupBoxReleaseResponse.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -496,11 +629,20 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label labelPractitionerName;
         private System.Windows.Forms.Button buttonGetSignature;
-        private System.Windows.Forms.Button buttonCreateRelease;
+        private System.Windows.Forms.Button buttonAcceptReleaseResponse;
         private System.Windows.Forms.TextBox textBoxStatus;
         private System.Windows.Forms.Button buttonClear;
         private System.Windows.Forms.ComboBox comboBoxSpecialty;
         private System.Windows.Forms.Label labelSpecialty;
+        private System.Windows.Forms.Button buttonAddPatient;
+        private System.Windows.Forms.Button buttonAddNewDoctor;
+        private System.Windows.Forms.GroupBox groupBoxReleaseResponse;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.Label labelReceived;
+        private System.Windows.Forms.DateTimePicker dateTimePicker2;
+        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.DateTimePicker dateTimePicker1;
 
     }
 }

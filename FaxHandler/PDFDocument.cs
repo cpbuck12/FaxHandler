@@ -44,6 +44,13 @@ namespace FaxHandler.PDF
         AcroAVDoc AVDocument = null;
         AcroPDDoc PDDocument = null;
         string fileName;
+        public string FileName
+        {
+            get
+            {
+                return fileName;
+            }
+        }
         private AcroPDDoc PDDoc()
         {
             if (PDDocument == null)
