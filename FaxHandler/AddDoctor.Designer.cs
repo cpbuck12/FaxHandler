@@ -34,12 +34,15 @@
             this.labelDivider = new System.Windows.Forms.Label();
             this.buttonOk = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
+            this.buttonSearch = new System.Windows.Forms.Button();
+            this.comboBoxSearchEngines = new System.Windows.Forms.ComboBox();
+            this.buttonCopyToOutlook = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // labelDoctor
             // 
             this.labelDoctor.AutoSize = true;
-            this.labelDoctor.Location = new System.Drawing.Point(29, 16);
+            this.labelDoctor.Location = new System.Drawing.Point(26, 27);
             this.labelDoctor.Name = "labelDoctor";
             this.labelDoctor.Size = new System.Drawing.Size(42, 13);
             this.labelDoctor.TabIndex = 0;
@@ -49,7 +52,7 @@
             // 
             this.labelName.AutoSize = true;
             this.labelName.Font = new System.Drawing.Font("Courier New", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelName.Location = new System.Drawing.Point(104, 16);
+            this.labelName.Location = new System.Drawing.Point(105, 26);
             this.labelName.Name = "labelName";
             this.labelName.Size = new System.Drawing.Size(56, 16);
             this.labelName.TabIndex = 1;
@@ -90,13 +93,46 @@
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             // 
+            // buttonSearch
+            // 
+            this.buttonSearch.Location = new System.Drawing.Point(357, 22);
+            this.buttonSearch.Name = "buttonSearch";
+            this.buttonSearch.Size = new System.Drawing.Size(75, 23);
+            this.buttonSearch.TabIndex = 6;
+            this.buttonSearch.Text = "Search";
+            this.buttonSearch.UseVisualStyleBackColor = true;
+            this.buttonSearch.Click += new System.EventHandler(this.buttonSearch_Click);
+            // 
+            // comboBoxSearchEngines
+            // 
+            this.comboBoxSearchEngines.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxSearchEngines.FormattingEnabled = true;
+            this.comboBoxSearchEngines.Location = new System.Drawing.Point(438, 24);
+            this.comboBoxSearchEngines.Name = "comboBoxSearchEngines";
+            this.comboBoxSearchEngines.Size = new System.Drawing.Size(121, 21);
+            this.comboBoxSearchEngines.TabIndex = 7;
+            // 
+            // buttonCopyToOutlook
+            // 
+            this.buttonCopyToOutlook.Location = new System.Drawing.Point(272, 460);
+            this.buttonCopyToOutlook.Name = "buttonCopyToOutlook";
+            this.buttonCopyToOutlook.Size = new System.Drawing.Size(141, 23);
+            this.buttonCopyToOutlook.TabIndex = 8;
+            this.buttonCopyToOutlook.Text = "Copy To Outlook...";
+            this.buttonCopyToOutlook.UseVisualStyleBackColor = true;
+            this.buttonCopyToOutlook.Click += new System.EventHandler(this.buttonCopyToOutlook_Click);
+            // 
             // AddDoctor
             // 
             this.AcceptButton = this.buttonOk;
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(741, 494);
+            this.Controls.Add(this.buttonCopyToOutlook);
+            this.Controls.Add(this.comboBoxSearchEngines);
+            this.Controls.Add(this.buttonSearch);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOk);
             this.Controls.Add(this.labelDivider);
@@ -105,6 +141,8 @@
             this.Controls.Add(this.labelDoctor);
             this.Name = "AddDoctor";
             this.Text = "AddDoctor";
+            this.DragDrop += new System.Windows.Forms.DragEventHandler(this.AddDoctor_DragDrop);
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.AddDoctor_DragEnter);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -118,5 +156,8 @@
         private System.Windows.Forms.Label labelDivider;
         private System.Windows.Forms.Button buttonOk;
         private System.Windows.Forms.Button buttonCancel;
+        private System.Windows.Forms.Button buttonSearch;
+        private System.Windows.Forms.ComboBox comboBoxSearchEngines;
+        private System.Windows.Forms.Button buttonCopyToOutlook;
     }
 }

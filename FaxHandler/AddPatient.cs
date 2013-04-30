@@ -43,6 +43,8 @@ namespace FaxHandler
     }
     public class PatientProperties
     {
+        public string First { get; set; }
+        public string Last { get; set; } 
         public DateTime DateOfBirth { get; set; }
         [TypeConverter(typeof(MyConverter))]
         [DefaultValue("F")]

@@ -41,7 +41,7 @@ namespace FaxHandler
         {
             InitializeComponent();
             ClearReader();
-            labelPatientNameValue.Text = owner.LastName + "," + owner.FirstName;
+            labelPatientNameValue.Text = owner.patient_last + "," + owner.patient_first;
             signatureControl.SetImageFileFormat(0);
             signatureControl.SetImageXSize(881);
             signatureControl.SetImageYSize(287);

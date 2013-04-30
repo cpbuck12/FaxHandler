@@ -55,6 +55,9 @@
     <Reference Include="Microsoft.Office.Interop.Outlook, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
+    <Reference Include="Microsoft.Office.Interop.Word, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Office, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -82,6 +85,12 @@
     <Compile Include="AddDoctor.Designer.cs">
       <DependentUpon>AddDoctor.cs</DependentUpon>
     </Compile>
+    <Compile Include="AddLocation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AddLocation.Designer.cs">
+      <DependentUpon>AddLocation.cs</DependentUpon>
+    </Compile>
     <Compile Include="AddPatient.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -101,12 +110,19 @@
       <DependentUpon>Dragger.cs</DependentUpon>
     </Compile>
     <Compile Include="EnumExtensions.cs" />
+    <Compile Include="Get Release.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Get Release.Designer.cs">
+      <DependentUpon>Get Release.cs</DependentUpon>
+    </Compile>
     <Compile Include="GetSignatureForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GetSignatureForm.Designer.cs">
       <DependentUpon>GetSignatureForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ItemHolder.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -130,6 +146,9 @@
     <EmbeddedResource Include="AddDoctor.resx">
       <DependentUpon>AddDoctor.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="AddLocation.resx">
+      <DependentUpon>AddLocation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="AddPatient.resx">
       <DependentUpon>AddPatient.cs</DependentUpon>
     </EmbeddedResource>
@@ -138,6 +157,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dragger.resx">
       <DependentUpon>Dragger.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Get Release.resx">
+      <DependentUpon>Get Release.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="GetSignatureForm.resx">
       <DependentUpon>GetSignatureForm.cs</DependentUpon>
@@ -159,6 +181,7 @@
       <DependentUpon>SetupForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
     <None Include="conciergeEntities.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
